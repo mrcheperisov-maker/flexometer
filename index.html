@@ -248,20 +248,24 @@
             color: #aaa;
             cursor: not-allowed;
         }
+        
+        /* Заметная кнопка предпросмотра (изменен цвет) */
         .preview-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #8e44ad, #3498db);
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid #9b59b6;
             border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: 15px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
         }
         .preview-btn:hover {
-            background: rgba(36, 129, 204, 0.8);
-            border-color: #2481cc;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #9b59b6, #2980b9);
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+            transform: scale(1.08);
         }
 
         /* Цвет описания проблемы — строгий черный текст */
@@ -573,7 +577,7 @@
             leaderboardList.innerHTML = `
                 <div class="leader-item my-score">
                     <span>👑 1. ${tgUser?.first_name || 'Вы'} (Ур. ${info.level})</span>
-                    <span style="color: #00ff66; font-weight: bold; text-shadow: 0 0 6px rgba(0,255,102,0.4);">${xp.toLocaleString()} XP</span>
+                    <span style="color: #00ff66; font-weight: bold; text-shadow: 0 0 8px rgba(0,255,102,0.6);">${xp.toLocaleString()} XP</span>
                 </div>
             `;
         }
@@ -631,6 +635,7 @@
                                     saveData();
                                     updateUI();
                                     renderShop();
+                                    applyEquippedStyle();
                                     checkDailyStatus();
                                 });
                             });
@@ -646,6 +651,7 @@
 
                 updateUI();
                 renderShop();
+                applyEquippedStyle();
                 checkDailyStatus();
             }
         }
@@ -968,7 +974,6 @@
         }
 
         loadData();
-        applyEquippedStyle();
     </script>
 </body>
 </html>
