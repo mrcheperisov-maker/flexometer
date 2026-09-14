@@ -236,6 +236,9 @@
             margin-top: 8px;
             outline: none;
             font-family: inherit;
+            pointer-events: auto !important;
+            -webkit-user-select: text;
+            user-select: text;
         }
         .feedback-input:focus {
             border-color: #2481cc;
@@ -874,22 +877,24 @@
         }
 
         function sendFeedback() {
-            const text = document.getElementById('feedbackText').value.trim();
+            const textarea = document.getElementById('feedbackText');
+            const text = textarea.value.trim();
+            
             if (!text) {
                 alert("Поле ввода пустое!");
                 return;
             }
             
-            const webApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            const payload = JSON.stringify({ action: 'feedback', message: text });
 
-            if (webApp && typeof webApp.sendData === 'function') {
-                webApp.sendData(JSON.stringify({ action: 'feedback', message: text }));
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+                window.Telegram.WebApp.sendData(payload);
             } else {
-                alert("✅ Спасибо за отзыв! Твое сообщение передано разработчику (тестовый режим).");
-                console.log("Mock sendData:", text);
+                alert("✅ Спасибо! (В браузере Telegram.WebApp.sendData недоступен, но текст зафиксирован)");
+                console.log("Feedback sent:", text);
             }
             
-            document.getElementById('feedbackText').value = '';
+            textarea.value = '';
         }
 
         window.addEventListener('DOMContentLoaded', () => {
