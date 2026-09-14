@@ -249,16 +249,22 @@
             cursor: not-allowed;
         }
         .preview-btn {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 8px;
-            padding: 6px 8px;
-            font-size: 12px;
+            padding: 6px 10px;
+            font-size: 14px;
             cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .preview-btn:hover {
+            background: rgba(36, 129, 204, 0.8);
+            border-color: #2481cc;
+            transform: scale(1.05);
         }
 
-        /* Цвет описания проблемы — строгий черный текст, как вы просили */
+        /* Цвет описания проблемы — строгий черный текст */
         .feedback-input {
             width: 100%;
             background: #ffffff !important;
@@ -431,7 +437,7 @@
             <button class="btn" id="dailyBtn" onclick="claimDaily()" style="background: #27ae60;">🎁 Забрать бонус (+100 XP)</button>
         </div>
 
-        <!-- Топ чарта (перенесен прямо под кликер, отображает реальный XP и уровень) -->
+        <!-- Топ чарта -->
         <div class="section-title">🏆 Топ чарта</div>
         <div class="leaderboard" id="leaderboardList">
             <!-- Динамически заполнится реальными данными игрока -->
@@ -441,11 +447,11 @@
         <div class="card" style="text-align: left;">
             <div class="section-title collapsible-header" onclick="toggleShop()" style="margin-top: 0;">
                 <span>🎨 Магазин рамок</span>
-                <span id="shopArrow" class="arrow-icon">▼</span>
+                <span id="shopArrow" class="arrow-icon collapsed">▼</span>
             </div>
             <div id="shopContainer">
                 <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin: 8px 0;">XP не тратятся, но за звёзды — покупка полная!</div>
-                <div class="shop-grid" id="shopList"></div>
+                <div class="shop-grid hidden" id="shopList"></div>
             </div>
         </div>
 
@@ -487,7 +493,7 @@
         let stars = 0;
         let lastClaimTimestamp = 0;
         let boostUntil = 0;
-        let isShopOpen = false;
+        let isShopOpen = false; // Магазин по умолчанию закрыт
 
         const framesData = [
             { id: 'f_xp_1', name: 'Древесный массив', type: 'xp', price: 1000, css: 'border: 4px solid #8B4513; background: repeating-linear-gradient(45deg, #3d1c02, #3d1c02 10px, #261101 10px, #261101 20px);' },
@@ -553,7 +559,6 @@
         function updateUI() {
             const info = getLevelAndRank(xp);
             
-            // Заполняем профиль
             document.getElementById('userXp').innerText = xp.toLocaleString();
             document.getElementById('userStars').innerText = stars;
             document.getElementById('userLevel').innerText = `Уровень ${info.level}`;
@@ -564,12 +569,11 @@
                 document.getElementById('userName').innerText = tgUser.first_name;
             }
 
-            // Рендерим топ чарта с реальным XP и уровнем
             const leaderboardList = document.getElementById('leaderboardList');
             leaderboardList.innerHTML = `
                 <div class="leader-item my-score">
                     <span>👑 1. ${tgUser?.first_name || 'Вы'} (Ур. ${info.level})</span>
-                    <span style="color: #2ecc71; font-weight: bold;">${xp.toLocaleString()} XP</span>
+                    <span style="color: #00ff66; font-weight: bold; text-shadow: 0 0 6px rgba(0,255,102,0.4);">${xp.toLocaleString()} XP</span>
                 </div>
             `;
         }
@@ -696,7 +700,6 @@
             }
         }
 
-        // Сочная анимация тапа с вылетающими цифрами
         function tapXp(event) {
             let addAmount = 10;
             if (Date.now() < boostUntil) {
@@ -706,13 +709,11 @@
             saveData();
             updateUI();
 
-            // Создаем вылетающий текст с очками
             const btnRect = event.target.getBoundingClientRect();
             const floatEl = document.createElement('div');
             floatEl.className = 'floating-text';
             floatEl.innerText = `+${addAmount} XP`;
             
-            // Рандомное смещение по горизонтали для красоты
             const randomX = (Math.random() - 0.5) * 50;
             floatEl.style.left = `${event.clientX || (btnRect.left + btnRect.width / 2) + randomX}px`;
             floatEl.style.top = `${btnRect.top}px`;
@@ -761,7 +762,6 @@
             }
         }
 
-        // Отправка багов напрямую боту (окно не закрывается) с кнопкой связи
         async function sendFeedback() {
             const text = document.getElementById('feedbackText').value.trim();
             if (!text) {
@@ -851,7 +851,7 @@
                         <div class="shop-price">${frame.price} ${frame.type === 'xp' ? 'XP' : '⭐️'}</div>
                     </div>
                     <div class="shop-actions">
-                        <button class="preview-btn" onclick="openPreview('${frame.id}')">👁</button>
+                        <button class="preview-btn" onclick="openPreview('${frame.id}')" title="Предпросмотр рамки">👁</button>
                         ${actionBtnHTML}
                     </div>
                 `;
@@ -967,7 +967,6 @@
             document.getElementById('previewModal').style.display = 'none';
         }
 
-        // Запуск при загрузке
         loadData();
         applyEquippedStyle();
     </script>
