@@ -874,12 +874,21 @@
             }
         }
 
-        function sendFeedback() {
+       function sendFeedback() {
     const text = document.getElementById('feedbackText').value.trim();
     if (!text) {
-        alert("Поле ввода пустое! Напиши свой отзыв или идею.");
+        alert("Поле ввода пустое!");
         return;
     }
+    
+    // Проверяем, что видит приложение
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
+        alert("Отправляем в Telegram!");
+        window.Telegram.WebApp.sendData(JSON.stringify({ action: 'feedback', message: text }));
+    } else {
+        alert("ОШИБКА: Telegram WebApp не обнаружен! tg.sendData недоступен.");
+    }
+}
     
     // Получаем объект WebApp безопасно
     const webApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
