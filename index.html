@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-   <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flexometer</title>
+    <title>Флексометр</title>
     <!-- Подключаем официальный скрипт Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -772,7 +772,6 @@
             }
             tapTimestamps.push(now);
 
-            // Базово 10 XP за клик, под бустом +25 XP
             let gain = 10;
             if (boostUntil > now) {
                 gain = 25;
@@ -874,36 +873,24 @@
             }
         }
 
-       function sendFeedback() {
-    const text = document.getElementById('feedbackText').value.trim();
-    if (!text) {
-        alert("Поле ввода пустое!");
-        return;
-    }
-    
-    // Проверяем, что видит приложение
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
-        alert("Отправляем в Telegram!");
-        window.Telegram.WebApp.sendData(JSON.stringify({ action: 'feedback', message: text }));
-    } else {
-        alert("ОШИБКА: Telegram WebApp не обнаружен! tg.sendData недоступен.");
-    }
-}
-    
-    // Получаем объект WebApp безопасно
-    const webApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        function sendFeedback() {
+            const text = document.getElementById('feedbackText').value.trim();
+            if (!text) {
+                alert("Поле ввода пустое!");
+                return;
+            }
+            
+            const webApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-    if (webApp && typeof webApp.sendData === 'function') {
-        // Упаковываем в JSON и отправляем боту (при этом мини-приложение закроется и откроется чат с ботом)
-        webApp.sendData(JSON.stringify({ action: 'feedback', message: text }));
-    } else {
-        // Если запущено не в Telegram (например, в обычном браузере для теста)
-        alert("✅ Спасибо за отзыв! Твое сообщение передано разработчику (тестовый режим).");
-        console.log("Mock sendData:", text);
-    }
-    
-    document.getElementById('feedbackText').value = '';
-}
+            if (webApp && typeof webApp.sendData === 'function') {
+                webApp.sendData(JSON.stringify({ action: 'feedback', message: text }));
+            } else {
+                alert("✅ Спасибо за отзыв! Твое сообщение передано разработчику (тестовый режим).");
+                console.log("Mock sendData:", text);
+            }
+            
+            document.getElementById('feedbackText').value = '';
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             if (tg.CloudStorage) {
