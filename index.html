@@ -186,7 +186,7 @@
         }
         .wheel-sector-label {
             position: absolute;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
             text-shadow: 0 1px 2px rgba(0,0,0,0.9);
             pointer-events: none;
@@ -428,8 +428,8 @@
 
         <!-- Ежедневное Колесо Удачи (10 секций) -->
         <div class="card" id="wheelCard">
-            <div class="section-title" style="margin-top: 0;">🎁 Ежедневное Колесо Удачи</div>
-            <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin-bottom: 5px;">10 секций • Джекпот 5000 XP (1%)</div>
+            <div class="section-title" style="margin-top: 0;">🎁 Ежедневное бесплатное колесо фортуны обновляется в 8:00</div>
+            <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin-bottom: 5px;">Джекпот 5000 XP (1%)</div>
             
             <div class="wheel-box-container">
                 <div class="wheel-pointer">▼</div>
@@ -451,7 +451,7 @@
                 <span id="shopArrow" class="arrow-icon collapsed">▼</span>
             </div>
             <div id="shopContainer">
-                <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin: 8px 0;">XP не тратятся, но за звёзды — покупка полная!</div>
+                <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin: 8px 0;">Нажмите на глазок (👁), чтобы открыть превью и купить рамку!</div>
                 <div class="shop-grid hidden" id="shopList"></div>
             </div>
         </div>
@@ -501,13 +501,13 @@
         const sectors = [
             { text: "5000 👑", prize: 5000, color: "#f1c40f", textColor: "#000" },
             { text: "2000 XP", prize: 2000, color: "#e67e22", textColor: "#fff" },
-            { text: "1800 XP", prize: 1800, color: "#27ae60", textColor: "#fff" },
-            { text: "1500 XP", prize: 1500, color: "#2980b9", textColor: "#fff" },
-            { text: "1200 XP", prize: 1200, color: "#8e44ad", textColor: "#fff" },
-            { text: "1000 XP", prize: 1000, color: "#16a085", textColor: "#fff" },
-            { text: "800 XP",  prize: 800,  color: "#d35400", textColor: "#fff" },
-            { text: "500 XP",  prize: 500,  color: "#2c3e50", textColor: "#fff" },
-            { text: "300 XP",  prize: 300,  color: "#7f8c8d", textColor: "#fff" },
+            { text: "1800 XP", prize: 1800, color: "#d35400", textColor: "#fff" },
+            { text: "1500 XP", prize: 1500, color: "#27ae60", textColor: "#fff" },
+            { text: "1200 XP", prize: 1200, color: "#16a085", textColor: "#fff" },
+            { text: "1000 XP", prize: 1000, color: "#2980b9", textColor: "#fff" },
+            { text: "800 XP",  prize: 800,  color: "#2980b9", textColor: "#fff" },
+            { text: "500 XP",  prize: 500,  color: "#8e44ad", textColor: "#fff" },
+            { text: "300 XP",  prize: 300,  color: "#8e44ad", textColor: "#fff" },
             { text: "100 XP",  prize: 100,  color: "#c0392b", textColor: "#fff" }
         ];
 
@@ -516,13 +516,15 @@
             wheel.innerHTML = '';
             
             let gradientParts = [];
+            const sectorAngle = 360 / sectors.length;
+
             sectors.forEach((sec, i) => {
-                const start = i * 36;
-                const end = (i + 1) * 36;
+                const start = i * sectorAngle;
+                const end = (i + 1) * sectorAngle;
                 gradientParts.push(`${sec.color} ${start}deg ${end}deg`);
 
                 // Точное позиционирование цифр по центру каждой секции
-                const angleDeg = i * 36 + 18;
+                const angleDeg = i * sectorAngle + (sectorAngle / 2);
                 const angleRad = (angleDeg - 90) * (Math.PI / 180);
                 const radius = 68;
                 const cx = 110;
@@ -643,9 +645,7 @@
             const localXp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
             const localStars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
             const localEq = localStorage.getItem('flex_equipped_frame_backup') || 'default';
-            
-            // Сбрасываем таймер для теста
-            let localClaim = 0; 
+            let localClaim = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
             
             let localFrames = ['default'];
             try {
@@ -659,27 +659,31 @@
                     
                     tg.CloudStorage.getItem('flex_stars', (err2, cloudStarsVal) => {
                         const cloudStars = (!err2 && cloudStarsVal !== null) ? parseInt(cloudStarsVal) || 0 : 0;
+
+                        tg.CloudStorage.getItem('flex_last_claim', (err3, cloudClaimVal) => {
+                            const cloudClaim = (!err3 && cloudClaimVal !== null) ? parseInt(cloudClaimVal) || 0 : 0;
                         
-                        tg.CloudStorage.getItem('flex_owned_frames', (err4, cloudFramesVal) => {
-                            let cloudFrames = ['default'];
-                            if (!err4 && cloudFramesVal) {
-                                try { cloudFrames = JSON.parse(cloudFramesVal); } catch(e){}
-                            }
+                            tg.CloudStorage.getItem('flex_owned_frames', (err4, cloudFramesVal) => {
+                                let cloudFrames = ['default'];
+                                if (!err4 && cloudFramesVal) {
+                                    try { cloudFrames = JSON.parse(cloudFramesVal); } catch(e){}
+                                }
 
-                            tg.CloudStorage.getItem('flex_equipped_frame', (err5, cloudEqVal) => {
-                                const cloudEq = (!err5 && cloudEqVal) ? cloudEqVal : 'default';
+                                tg.CloudStorage.getItem('flex_equipped_frame', (err5, cloudEqVal) => {
+                                    const cloudEq = (!err5 && cloudEqVal) ? cloudEqVal : 'default';
 
-                                xp = Math.max(localXp, cloudXp);
-                                stars = Math.max(localStars, cloudStars);
-                                lastClaimTimestamp = 0; 
-                                ownedFrames = Array.from(new Set([...localFrames, ...cloudFrames]));
-                                equippedFrame = cloudEq !== 'default' ? cloudEq : localEq;
+                                    xp = Math.max(localXp, cloudXp);
+                                    stars = Math.max(localStars, cloudStars);
+                                    lastClaimTimestamp = Math.max(localClaim, cloudClaim);
+                                    ownedFrames = Array.from(new Set([...localFrames, ...cloudFrames]));
+                                    equippedFrame = cloudEq !== 'default' ? cloudEq : localEq;
 
-                                saveData();
-                                updateUI();
-                                renderShop();
-                                applyEquippedStyle();
-                                checkDailyStatus();
+                                    saveData();
+                                    updateUI();
+                                    renderShop();
+                                    applyEquippedStyle();
+                                    checkDailyStatus();
+                                });
                             });
                         });
                     });
@@ -687,7 +691,7 @@
             } else {
                 xp = localXp;
                 stars = localStars;
-                lastClaimTimestamp = 0; 
+                lastClaimTimestamp = localClaim;
                 ownedFrames = localFrames;
                 equippedFrame = localEq;
 
@@ -714,23 +718,39 @@
         }
 
         function checkDailyStatus() {
-            const now = Date.now();
-            const cooldownTime = 24 * 60 * 60 * 1000;
-            const timePassed = now - lastClaimTimestamp;
-            const wheelCard = document.getElementById('wheelCard');
+            const now = new Date();
+            
+            // Расчет сброса в 8:00 утра по текущему дню
+            let nextReset = new Date(now);
+            nextReset.setHours(8, 0, 0, 0);
+            
+            if (now.getTime() >= nextReset.getTime()) {
+                // Если сейчас уже позже 8:00 утра, то следующий сброс завтра в 8:00
+                nextReset.setDate(nextReset.getDate() + 1);
+            }
+
+            let lastReset = new Date(nextReset);
+            lastReset.setDate(lastReset.getDate() - 1); // Вчера в 8:00
+
             const btn = document.getElementById('dailySpinBtn');
 
-            if (timePassed < cooldownTime && lastClaimTimestamp > 0) {
-                wheelCard.classList.add('hidden-block');
+            // Проверяем, крутил ли пользователь после последнего 8:00 утра
+            if (lastClaimTimestamp >= lastReset.getTime()) {
+                // Вычисляем время до следующего сброса в 8:00
+                const timeLeft = nextReset.getTime() - now.getTime();
+                const hoursLeft = Math.floor(timeLeft / (60 * 60 * 1000));
+                const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+                
+                btn.innerText = `⏳ Следующий спин через ${hoursLeft}ч ${minutesLeft}м`;
+                btn.disabled = true;
             } else {
-                wheelCard.classList.remove('hidden-block');
                 btn.innerText = "🎰 Вращать колесо";
                 btn.disabled = false;
                 document.getElementById('wheelResult').innerText = "";
             }
         }
 
-        // Логика вращения колеса (1% на 5000 XP, равномерный шанс на остальные 9 секций)
+        // Логика вращения колеса (10 секций, 1% на 5000 XP)
         function spinDailyWheel() {
             if (isSpinning) return;
             isSpinning = true;
@@ -744,16 +764,18 @@
 
             const roll = Math.random() * 100;
             let selectedIndex = 0;
+            const sectorAngle = 360 / sectors.length;
+
             if (roll < 1) {
                 selectedIndex = 0; // 5000 XP (1% шанс)
             } else {
-                selectedIndex = Math.floor(Math.random() * 9) + 1; // секции 1-9
+                selectedIndex = Math.floor(Math.random() * (sectors.length - 1)) + 1;
             }
 
             const prize = sectors[selectedIndex].prize;
 
             // Расчет точного угла остановки по центру выбранного сектора
-            const targetOffset = 360 - (selectedIndex * 36 + 18);
+            const targetOffset = 360 - (selectedIndex * sectorAngle + (sectorAngle / 2));
             const totalRotation = currentWheelRotation + 5 * 360 + targetOffset;
             
             wheel.style.transform = `rotate(${totalRotation}deg)`;
@@ -771,9 +793,7 @@
                 resultDiv.innerText = `🎉 Вы выиграли +${prize} XP!`;
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 
-                setTimeout(() => {
-                    checkDailyStatus();
-                }, 2000);
+                checkDailyStatus();
 
             }, 4500);
         }
@@ -898,8 +918,7 @@
                 } else if (isOwned) {
                     actionBtnHTML = `<button class="shop-btn" onclick="equipFrame('${frame.id}')">Надеть</button>`;
                 } else {
-                    const canBuy = frame.type === 'xp' ? xp >= frame.price : stars >= frame.price;
-                    actionBtnHTML = `<button class="shop-btn ${canBuy ? '' : 'locked'}" onclick="buyFrame('${frame.id}')">Купить</button>`;
+                    actionBtnHTML = `<button class="shop-btn locked" onclick="openPreview('${frame.id}')">👁 Заглянуть</button>`;
                 }
 
                 itemEl.innerHTML = `
@@ -951,6 +970,7 @@
                     renderShop();
                     applyEquippedStyle();
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    closePreview();
                 } else {
                     alert('Недостаточно XP!');
                 }
@@ -964,6 +984,7 @@
                     renderShop();
                     applyEquippedStyle();
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    closePreview();
                 } else {
                     alert('Недостаточно звезд!');
                 }
@@ -998,7 +1019,7 @@
                 actionBtn.disabled = false;
                 modalTargetId = frame.id;
             } else {
-                actionBtn.innerText = "Разблокировать / Купить";
+                actionBtn.innerText = "Купить и надеть";
                 actionBtn.disabled = false;
                 modalTargetId = frame.id;
             }
@@ -1010,10 +1031,10 @@
             if (!modalTargetId) return;
             if (ownedFrames.includes(modalTargetId)) {
                 equipFrame(modalTargetId);
+                closePreview();
             } else {
                 buyFrame(modalTargetId);
             }
-            closePreview();
         }
 
         function closePreview() {
