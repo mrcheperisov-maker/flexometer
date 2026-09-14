@@ -40,53 +40,78 @@
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+        
+        /* Нереально красивый центральный элемент (аватарка) */
         .avatar-container {
-            width: 96px;
-            height: 96px;
-            margin: 10px auto;
+            width: 110px;
+            height: 110px;
+            margin: 12px auto;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            box-shadow: 0 0 20px rgba(255, 75, 43, 0.4);
-            transition: transform 0.1s ease;
+            background: linear-gradient(135deg, #ff007f, #7928ca, #00f2fe);
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.6), inset 0 0 15px rgba(0, 242, 254, 0.8);
             position: relative;
+            animation: avatarGlow 3s infinite alternate ease-in-out;
+        }
+        @keyframes avatarGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 0, 127, 0.5), inset 0 0 10px rgba(0, 242, 254, 0.6); transform: scale(1); }
+            100% { box-shadow: 0 0 40px rgba(0, 242, 254, 0.8), inset 0 0 20px rgba(255, 0, 127, 0.8); transform: scale(1.02); }
         }
         .avatar-inner {
-            width: 80px;
-            height: 80px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
-            background: #121212;
+            background: radial-gradient(circle, #1a1a2e 0%, #0f0f1a 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 44px;
             z-index: 2;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8);
         }
-        .pulse {
-            transform: scale(1.08);
-        }
+
+        /* Сочная анимация тапа и сама кнопка */
         .clicker-btn {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            background: linear-gradient(135deg, #ff416c, #ff4b2b, #ff8008);
             border: none;
             border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            font-size: 40px;
+            width: 130px;
+            height: 130px;
+            font-size: 50px;
             cursor: pointer;
             color: white;
-            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.4);
-            transition: transform 0.08s ease;
+            box-shadow: 0 10px 25px rgba(255, 65, 108, 0.6), inset 0 2px 5px rgba(255,255,255,0.4);
+            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             margin: 10px auto;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
         .clicker-btn:active {
-            transform: scale(0.92);
+            transform: scale(0.85);
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
         }
+
+        /* Вылетающие цифры при клике */
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 22px;
+            color: #00ffcc;
+            text-shadow: 0 0 8px rgba(0,255,204,0.8);
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            z-index: 100;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-70px) scale(1.3); }
+        }
+
         .section-title {
             font-size: 16px;
             font-weight: bold;
@@ -124,22 +149,30 @@
             color: #aaa;
             cursor: not-allowed;
         }
+        
+        /* Топ чарта */
         .leaderboard {
             background: var(--tg-theme-secondary-bg-color, #1e1e1e);
             border-radius: 16px;
             padding: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .leader-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            align-items: center;
+            padding: 8px 6px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             font-size: 14px;
-            color: #2ecc71;
-            text-align: center;
             font-weight: 500;
         }
+        .leader-item.my-score {
+            background: rgba(36, 129, 204, 0.15);
+            border-radius: 8px;
+            border-bottom: none;
+            margin-top: 4px;
+        }
+
         .boost-status {
             font-size: 13px;
             color: #ffd700;
@@ -224,13 +257,15 @@
             font-size: 12px;
             cursor: pointer;
         }
+
+        /* Цвет описания проблемы — строгий черный текст, как вы просили */
         .feedback-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 10px;
             padding: 10px;
-            color: #fff;
+            color: #000000 !important;
             font-size: 13px;
             resize: none;
             margin-top: 8px;
@@ -239,6 +274,9 @@
             pointer-events: auto !important;
             -webkit-user-select: text;
             user-select: text;
+        }
+        .feedback-input::placeholder {
+            color: #666666;
         }
         .feedback-input:focus {
             border-color: #2481cc;
@@ -385,12 +423,18 @@
             <div>Звезды: <span id="userStars" style="color: #ffd700; font-weight: bold;">0</span> ⭐️</div>
         </div>
 
-        <!-- Кликер для фарма XP -->
-        <div class="card">
+        <!-- Кликер для фарма XP (под ним сразу топ чарта) -->
+        <div class="card" id="clickerCard">
             <div style="font-size: 14px; margin-bottom: 5px;">Тапай для разгона хайпа! (+10 XP)</div>
-            <button class="clicker-btn" onclick="tapXp()">🔥</button>
+            <button class="clicker-btn" id="tapBtn" onclick="tapXp(event)">🔥</button>
             <div id="boostStatus" class="boost-status"></div>
             <button class="btn" id="dailyBtn" onclick="claimDaily()" style="background: #27ae60;">🎁 Забрать бонус (+100 XP)</button>
+        </div>
+
+        <!-- Топ чарта (перенесен прямо под кликер, отображает реальный XP и уровень) -->
+        <div class="section-title">🏆 Топ чарта</div>
+        <div class="leaderboard" id="leaderboardList">
+            <!-- Динамически заполнится реальными данными игрока -->
         </div>
 
         <!-- Магазин рамок профиля -->
@@ -418,15 +462,7 @@
             <div class="section-title" style="margin-top: 0;">💬 Обратная связь</div>
             <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa);">Нашёл баг или есть идея? Напиши разработчику!</div>
             <textarea id="feedbackText" class="feedback-input" rows="3" placeholder="Опиши баг или предложи фичу..."></textarea>
-            <button class="btn" onclick="sendFeedback()" style="background: #16a085;">📤 Отправить</button>
-        </div>
-
-        <!-- Топ чарта -->
-        <div class="section-title">Топ чарта</div>
-        <div class="leaderboard" id="leaderboardList">
-            <div class="leader-item" style="color: var(--tg-theme-hint-color, #aaa);">
-                <span>Топ пока пуст. Стань первым! 🚀</span>
-            </div>
+            <button class="btn" onclick="sendFeedback()" style="background: #16a085; margin-top: 10px;">📤 Отправить</button>
         </div>
     </div>
 
@@ -450,7 +486,6 @@
         let xp = 0;
         let stars = 0;
         let lastClaimTimestamp = 0;
-
         let boostUntil = 0;
         let isShopOpen = false;
 
@@ -515,6 +550,30 @@
             return { level, rank: levelsData[rankIndex] };
         }
 
+        function updateUI() {
+            const info = getLevelAndRank(xp);
+            
+            // Заполняем профиль
+            document.getElementById('userXp').innerText = xp.toLocaleString();
+            document.getElementById('userStars').innerText = stars;
+            document.getElementById('userLevel').innerText = `Уровень ${info.level}`;
+            document.getElementById('userStatus').innerText = info.rank;
+
+            const tgUser = tg.initDataUnsafe?.user;
+            if (tgUser && tgUser.first_name) {
+                document.getElementById('userName').innerText = tgUser.first_name;
+            }
+
+            // Рендерим топ чарта с реальным XP и уровнем
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = `
+                <div class="leader-item my-score">
+                    <span>👑 1. ${tgUser?.first_name || 'Вы'} (Ур. ${info.level})</span>
+                    <span style="color: #2ecc71; font-weight: bold;">${xp.toLocaleString()} XP</span>
+                </div>
+            `;
+        }
+
         function toggleShop() {
             isShopOpen = !isShopOpen;
             const shopList = document.getElementById('shopList');
@@ -528,7 +587,6 @@
             }
         }
 
-        // УМНАЯ загрузка данных (синхронизация облака и локального кэша)
         function loadData() {
             const localXp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
             const localStars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
@@ -611,7 +669,6 @@
             }
 
             const btn = document.getElementById('dailyBtn');
-
             if (lastClaimTimestamp >= target8amToday) {
                 btn.innerText = "⏳ Бонус уже получен (сброс в 08:00)";
                 btn.disabled = true;
@@ -639,7 +696,8 @@
             }
         }
 
-        function tapXp() {
+        // Сочная анимация тапа с вылетающими цифрами
+        function tapXp(event) {
             let addAmount = 10;
             if (Date.now() < boostUntil) {
                 addAmount = 20;
@@ -647,7 +705,21 @@
             xp += addAmount;
             saveData();
             updateUI();
-            renderShop();
+
+            // Создаем вылетающий текст с очками
+            const btnRect = event.target.getBoundingClientRect();
+            const floatEl = document.createElement('div');
+            floatEl.className = 'floating-text';
+            floatEl.innerText = `+${addAmount} XP`;
+            
+            // Рандомное смещение по горизонтали для красоты
+            const randomX = (Math.random() - 0.5) * 50;
+            floatEl.style.left = `${event.clientX || (btnRect.left + btnRect.width / 2) + randomX}px`;
+            floatEl.style.top = `${btnRect.top}px`;
+            
+            document.body.appendChild(floatEl);
+            setTimeout(() => floatEl.remove(), 600);
+
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
@@ -657,7 +729,6 @@
                 boostUntil = Date.now() + 5 * 60 * 1000;
                 saveData();
                 updateUI();
-                renderShop();
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } else {
                 alert('Недостаточно звезд для буста!');
@@ -671,7 +742,6 @@
                 stars += rewardStars;
                 saveData();
                 updateUI();
-                renderShop();
                 alert(`Колесо удачи сыграно! Вы выиграли ${rewardStars} звезд! ⭐️`);
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } else {
@@ -691,229 +761,215 @@
             }
         }
 
-        // ИСПРАВЛЕНА ОТПРАВКА С ТЕЛЕФОНА: отправка через sendData + принудительное закрытие tg.close()
-     async function sendFeedback() {
-    const text = document.getElementById('feedbackText').value.trim();
-    if (!text) {
-        alert('Введите текст сообщения!');
-        return;
-    }
-    
-    // Получаем ID и имя пользователя из Telegram WebApp
-    const userId = tg.initDataUnsafe?.user?.id;
-    const userName = tg.initDataUnsafe?.user?.first_name || "Пользователь";
-    const userUsername = tg.initDataUnsafe?.user?.username ? `@${tg.initDataUnsafe?.user?.username}` : "нет юзернейма";
-    
-    if (!userId) {
-        alert('Не удалось определить ваш ID. Откройте приложение из Telegram.');
-        return;
-    }
+        // Отправка багов напрямую боту (окно не закрывается) с кнопкой связи
+        async function sendFeedback() {
+            const text = document.getElementById('feedbackText').value.trim();
+            if (!text) {
+                alert('Введите текст сообщения!');
+                return;
+            }
+            
+            const userId = tg.initDataUnsafe?.user?.id;
+            const userName = tg.initDataUnsafe?.user?.first_name || "Пользователь";
+            const userUsername = tg.initDataUnsafe?.user?.username ? `@${tg.initDataUnsafe?.user?.username}` : "нет юзернейма";
+            
+            if (!userId) {
+                alert('Не удалось определить ваш ID. Откройте приложение из Telegram.');
+                return;
+            }
 
-    try {
-        const BOT_TOKEN = "8621467356:AAEzfMdw8tiqa8kIkQd3xgDGZSN_VyaBhpc";
-        const ADMIN_ID = 1149554270;
-        
-        const reportText = `💬 <b>Новый отзыв или баг из Флексометра!</b>\n\n👤 <b>От:</b> ${userName} (${userUsername}, ID: <code>${userId}</code>)\n📝 <b>Текст:</b>\n${text}`;
+            try {
+                const BOT_TOKEN = "8621467356:AAEzfMdw8tiqa8kIkQd3xgDGZSN_VyaBhpc";
+                const ADMIN_ID = 1149554270;
+                
+                const reportText = `💬 <b>Новый отзыв или баг из Флексометра!</b>\n\n👤 <b>От:</b> ${userName} (${userUsername}, ID: <code>${userId}</code>)\n📝 <b>Текст:</b>\n${text}`;
 
-        // 1. Отправляем отчет тебе (админу) С КНОПКОЙ СВЯЗИ
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: ADMIN_ID,
-                text: reportText,
-                parse_mode: 'HTML',
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            { text: "💬 Написать игроку", url: `tg://user?id=${userId}` }
-                        ]
-                    ]
-                }
-            })
-        });
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: ADMIN_ID,
+                        text: reportText,
+                        parse_mode: 'HTML',
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: "💬 Написать игроку", url: `tg://user?id=${userId}` }
+                                ]
+                            ]
+                        }
+                    })
+                });
 
-        // 2. Отправляем подтверждение пользователю в чат с ботом
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: userId,
-                text: "✅ Спасибо! Твое сообщение успешно отправлено разработчику."
-            })
-        });
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: userId,
+                        text: "✅ Спасибо! Твое сообщение успешно отправлено разработчику."
+                    })
+                });
 
-        // Очищаем поле, приложение при этом остается открытым
-        document.getElementById('feedbackText').value = '';
-        alert('Сообщение успешно отправлено!');
+                document.getElementById('feedbackText').value = '';
+                alert('Сообщение успешно отправлено!');
 
-    } catch (error) {
-        console.error('Ошибка отправки:', error);
-        alert('Не удалось отправить сообщение. Попробуйте позже.');
-    }
-}
-
-        function renderShop() {
-            const list = document.getElementById('shopList');
-            let html = `
-                <div class="shop-item">
-                    <div class="shop-info" onclick="openPreview('default')">
-                        <span class="shop-name">⚪️ Стандартный обод</span>
-                        <span class="shop-price">Доступно</span>
-                    </div>
-                    <div class="shop-actions">
-                        <button class="preview-btn" onclick="openPreview('default')">👁</button>
-                        <button class="shop-btn ${equippedFrame === 'default' ? 'equipped' : ''}" onclick="equipFrame('default')">
-                            ${equippedFrame === 'default' ? 'Надета' : 'Надеть'}
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            framesData.forEach(f => {
-                const isOwned = ownedFrames.includes(f.id);
-                const isEquipped = equippedFrame === f.id;
-                const canUnlock = (f.type === 'xp' ? xp >= f.price : stars >= f.price);
-
-                let btnText = isOwned ? (isEquipped ? 'Надета' : 'Надеть') : (canUnlock ? 'Купить' : 'Закрыто');
-                let btnClass = isEquipped ? 'equipped' : (!isOwned && !canUnlock ? 'locked' : '');
-
-                html += `
-                    <div class="shop-item">
-                        <div class="shop-info" onclick="openPreview('${f.id}')">
-                            <span class="shop-name">${f.name}</span>
-                            <span class="shop-price">Цена: ${f.price} ${f.type === 'xp' ? 'XP (без списания)' : '⭐️'}</span>
-                        </div>
-                        <div class="shop-actions">
-                            <button class="preview-btn" onclick="openPreview('${f.id}')">👁</button>
-                            <button class="shop-btn ${btnClass}" onclick="unlockOrEquipFrame('${f.id}')">
-                                ${btnText}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            list.innerHTML = html;
+            } catch (error) {
+                console.error('Ошибка отправки:', error);
+                alert('Не удалось отправить сообщение. Попробуйте позже.');
+            }
         }
 
-        function openPreview(id) {
-            currentPreviewId = id;
-            const modal = document.getElementById('previewModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalAvatarBox = document.getElementById('modalAvatarBox');
-            const modalPrice = document.getElementById('modalPrice');
-            const modalActionBtn = document.getElementById('modalActionBtn');
+        function renderShop() {
+            const shopList = document.getElementById('shopList');
+            shopList.innerHTML = '';
 
-            if (id === 'default') {
-                modalTitle.innerText = 'Стандартный обод';
-                modalAvatarBox.className = 'modal-avatar';
-                modalAvatarBox.style.cssText = "width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff416c, #ff4b2b); box-shadow: 0 0 20px rgba(255, 75, 43, 0.4); margin: 15px auto; position: relative;";
-                modalPrice.innerText = 'Базовая рамка';
-                modalActionBtn.innerText = equippedFrame === 'default' ? 'Уже надета' : 'Надеть';
-                modalActionBtn.disabled = equippedFrame === 'default';
-            } else {
-                const f = framesData.find(item => item.id === id);
-                if (!f) return;
-                modalTitle.innerText = f.name;
+            framesData.forEach(frame => {
+                const isOwned = ownedFrames.includes(frame.id);
+                const isEquipped = equippedFrame === frame.id;
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'shop-item';
                 
-                modalAvatarBox.className = 'modal-avatar ' + (f.specialClass || '');
-                modalAvatarBox.style.cssText = `width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #121212; ${f.css || ''} margin: 15px auto; position: relative; overflow: hidden;`;
-                
-                modalPrice.innerText = f.type === 'xp' ? `Нужно: ${f.price} XP (очки не списываются)` : `Стоимость: ${f.price} ⭐️`;
-                
-                const isOwned = ownedFrames.includes(f.id);
-                const isEquipped = equippedFrame === f.id;
-                const canUnlock = (f.type === 'xp' ? xp >= f.price : stars >= f.price);
-                
+                let actionBtnHTML = '';
                 if (isEquipped) {
-                    modalActionBtn.innerText = 'Уже надета';
-                    modalActionBtn.disabled = true;
+                    actionBtnHTML = `<button class="shop-btn equipped">Надето</button>`;
                 } else if (isOwned) {
-                    modalActionBtn.innerText = 'Надеть';
-                    modalActionBtn.disabled = false;
-                } else if (canUnlock) {
-                    modalActionBtn.innerText = f.type === 'xp' ? 'Разблокировать' : 'Купить';
-                    modalActionBtn.disabled = false;
+                    actionBtnHTML = `<button class="shop-btn" onclick="equipFrame('${frame.id}')">Надеть</button>`;
                 } else {
-                    modalActionBtn.innerText = 'Недостаточно средств';
-                    modalActionBtn.disabled = true;
+                    if (frame.type === 'xp') {
+                        const canBuy = xp >= frame.price;
+                        actionBtnHTML = `<button class="shop-btn ${canBuy ? '' : 'locked'}" onclick="buyFrame('${frame.id}')">Купить</button>`;
+                    } else {
+                        const canBuy = stars >= frame.price;
+                        actionBtnHTML = `<button class="shop-btn ${canBuy ? '' : 'locked'}" onclick="buyFrame('${frame.id}')">Купить</button>`;
+                    }
+                }
+
+                itemEl.innerHTML = `
+                    <div class="shop-info" onclick="openPreview('${frame.id}')">
+                        <div class="shop-name">${frame.name}</div>
+                        <div class="shop-price">${frame.price} ${frame.type === 'xp' ? 'XP' : '⭐️'}</div>
+                    </div>
+                    <div class="shop-actions">
+                        <button class="preview-btn" onclick="openPreview('${frame.id}')">👁</button>
+                        ${actionBtnHTML}
+                    </div>
+                `;
+                shopList.appendChild(itemEl);
+            });
+        }
+
+        function equipFrame(frameId) {
+            equippedFrame = frameId;
+            saveData();
+            updateUI();
+            renderShop();
+            applyEquippedStyle();
+        }
+
+        function applyEquippedStyle() {
+            const avatarBox = document.getElementById('avatarBox');
+            avatarBox.className = "avatar-container";
+            avatarBox.style = "";
+
+            if (equippedFrame === 'default') return;
+
+            const frame = framesData.find(f => f.id === equippedFrame);
+            if (!frame) return;
+
+            if (frame.specialClass) {
+                avatarBox.classList.add(frame.specialClass);
+            }
+            if (frame.css) {
+                avatarBox.style.cssText += frame.css;
+            }
+        }
+
+        function buyFrame(frameId) {
+            const frame = framesData.find(f => f.id === frameId);
+            if (!frame) return;
+
+            if (frame.type === 'xp') {
+                if (xp >= frame.price) {
+                    ownedFrames.push(frame.id);
+                    equippedFrame = frame.id;
+                    saveData();
+                    updateUI();
+                    renderShop();
+                    applyEquippedStyle();
+                    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    alert('Недостаточно XP!');
+                }
+            } else {
+                if (stars >= frame.price) {
+                    stars -= frame.price;
+                    ownedFrames.push(frame.id);
+                    equippedFrame = frame.id;
+                    saveData();
+                    updateUI();
+                    renderShop();
+                    applyEquippedStyle();
+                    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    alert('Недостаточно звезд!');
                 }
             }
-            modal.style.display = 'flex';
+        }
+
+        let modalTargetId = null;
+        function openPreview(frameId) {
+            const frame = framesData.find(f => f.id === frameId);
+            if (!frame) return;
+            currentPreviewId = frameId;
+
+            document.getElementById('modalTitle').innerText = frame.name;
+            document.getElementById('modalPrice').innerText = `Цена: ${frame.price} ${frame.type === 'xp' ? 'XP' : '⭐️'}`;
+            
+            const modalBox = document.getElementById('modalAvatarBox');
+            modalBox.className = "modal-avatar";
+            modalBox.style = "";
+            if (frame.specialClass) modalBox.classList.add(frame.specialClass);
+            if (frame.css) modalBox.style.cssText += frame.css;
+
+            const actionBtn = document.getElementById('modalActionBtn');
+            const isOwned = ownedFrames.includes(frame.id);
+            const isEquipped = equippedFrame === frame.id;
+
+            if (isEquipped) {
+                actionBtn.innerText = "Уже надето";
+                actionBtn.disabled = true;
+                modalTargetId = null;
+            } else if (isOwned) {
+                actionBtn.innerText = "Надеть";
+                actionBtn.disabled = false;
+                modalTargetId = frame.id;
+            } else {
+                actionBtn.innerText = "Разблокировать / Купить";
+                actionBtn.disabled = false;
+                modalTargetId = frame.id;
+            }
+
+            document.getElementById('previewModal').style.display = 'flex';
+        }
+
+        function unlockOrEquipFromModal() {
+            if (!modalTargetId) return;
+            if (ownedFrames.includes(modalTargetId)) {
+                equipFrame(modalTargetId);
+            } else {
+                buyFrame(modalTargetId);
+            }
+            closePreview();
         }
 
         function closePreview() {
             document.getElementById('previewModal').style.display = 'none';
         }
 
-        function unlockOrEquipFromModal() {
-            if (!currentPreviewId) return;
-            if (currentPreviewId === 'default') {
-                equipFrame('default');
-            } else {
-                unlockOrEquipFrame(currentPreviewId);
-            }
-            openPreview(currentPreviewId);
-        }
-
-        function unlockOrEquipFrame(id) {
-            const frame = framesData.find(f => f.id === id);
-            if (!frame) return;
-
-            if (ownedFrames.includes(id)) {
-                equippedFrame = id;
-            } else {
-                const canUnlock = (frame.type === 'xp' ? xp >= frame.price : stars >= frame.price);
-                if (canUnlock) {
-                    if (frame.type === 'stars') {
-                        stars -= frame.price;
-                    }
-                    if (!ownedFrames.includes(id)) ownedFrames.push(id);
-                    equippedFrame = id;
-                } else {
-                    alert(frame.type === 'xp' ? 'Недостаточно XP!' : 'Недостаточно звезд!');
-                }
-            }
-            saveData();
-            updateUI();
-            renderShop();
-        }
-
-        function equipFrame(id) {
-            equippedFrame = id;
-            saveData();
-            updateUI();
-            renderShop();
-        }
-
-        function updateUI() {
-            const { level, rank } = getLevelAndRank(xp);
-            
-            document.getElementById('userXp').innerText = xp;
-            document.getElementById('userStars').innerText = stars;
-            document.getElementById('userLevel').innerText = `Уровень ${level}`;
-            document.getElementById('userStatus').innerText = rank;
-
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                document.getElementById('userName').innerText = user.first_name || 'Флексер';
-            }
-
-            const avatarBox = document.getElementById('avatarBox');
-            if (equippedFrame === 'default') {
-                avatarBox.className = 'avatar-container';
-                avatarBox.style.cssText = '';
-            } else {
-                const f = framesData.find(item => item.id === equippedFrame);
-                if (f) {
-                    avatarBox.className = 'avatar-container ' + (f.specialClass || '');
-                    avatarBox.style.cssText = `background: #121212; ${f.css || ''}`;
-                }
-            }
-        }
-
-        // Запуск загрузки при открытии
+        // Запуск при загрузке
         loadData();
+        applyEquippedStyle();
     </script>
 </body>
 </html>
