@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Флексометр</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #121212);
+            color: var(--tg-theme-text-color, #ffffff);
+            margin: 0;
+            padding: 15px;
+            padding-bottom: 50px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card {
+            background: var(--tg-theme-secondary-bg-color, #1e1e1e);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .avatar-container {
+            width: 96px;
+            height: 96px;
+            margin: 10px auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            box-shadow: 0 0 20px rgba(255, 75, 43, 0.4);
+            transition: transform 0.1s ease;
+            position: relative;
+        }
+        .avatar-inner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #121212;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            z-index: 2;
+        }
+        .pulse {
+            transform: scale(1.08);
+        }
+        .clicker-btn {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            border: none;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            font-size: 40px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.4);
+            transition: transform 0.08s ease;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .clicker-btn:active {
+            transform: scale(0.92);
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: var(--tg-theme-hint-color, #aaa);
+            text-align: left;
+        }
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .arrow-icon {
+            transition: transform 0.2s ease;
+        }
+        .arrow-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+        .btn {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 8px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:disabled {
+            background: #555 !important;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .leaderboard {
+            background: var(--tg-theme-secondary-bg-color, #1e1e1e);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 30px;
+        }
+        .leader-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+            color: #2ecc71;
+            text-align: center;
+            font-weight: 500;
+        }
+        .boost-status {
+            font-size: 13px;
+            color: #ffd700;
+            font-weight: bold;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+        .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+        }
+        .shop-grid.hidden {
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 0;
+            opacity: 0;
+            padding: 0;
+        }
+        .shop-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .shop-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            cursor: pointer;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+        .shop-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #2481cc;
+            text-decoration: underline;
+        }
+        .shop-price {
+            font-size: 12px;
+            color: #ffd700;
+        }
+        .shop-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .shop-btn {
+            background: #2481cc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .shop-btn.equipped {
+            background: #27ae60;
+            cursor: default;
+        }
+        .shop-btn.locked {
+            background: #555;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .preview-btn {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .feedback-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            font-size: 13px;
+            resize: none;
+            margin-top: 8px;
+            outline: none;
+            font-family: inherit;
+        }
+        .feedback-input:focus {
+            border-color: #2481cc;
+        }
+
+        /* Анимации рамок */
+        @keyframes spinGradient {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
+            50% { transform: scale(1.04); box-shadow: 0 0 25px #ff00ff, 0 0 45px #00ffff; }
+        }
+        @keyframes matrixScan {
+            0% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; }
+            50% { border-color: #00ffff; box-shadow: inset 0 0 20px #00ffff; }
+            100% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; }
+        }
+        @keyframes neonPulse {
+            0%, 100% { border-color: #00ffcc; box-shadow: 0 0 10px #00ffcc, inset 0 0 8px #00ffcc; }
+            50% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 18px #ff00ff; }
+        }
+        @keyframes lavaBreathe {
+            0%, 100% { border-color: #ff2200; box-shadow: 0 0 15px #ff2200, inset 0 0 10px #ff5500; }
+            50% { border-color: #ffbb00; box-shadow: 0 0 35px #ff5500, inset 0 0 22px #ffbb00; }
+        }
+        @keyframes cryoPrism {
+            0%, 100% { border-color: #00f2fe; box-shadow: 0 0 20px rgba(0,242,254,0.6), inset 0 0 12px rgba(74,144,226,0.5); filter: brightness(1); }
+            50% { border-color: #ffffff; box-shadow: 0 0 35px rgba(0,242,254,0.9), inset 0 0 22px rgba(255,255,255,0.8); filter: brightness(1.2); }
+        }
+        @keyframes fireStormPro {
+            0% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); }
+            50% { border-color: #ffea00; box-shadow: 0 0 40px #ff0055, inset 0 0 25px #ff2a00; filter: hue-rotate(20deg); }
+            100% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); }
+        }
+        @keyframes singularityCosmos {
+            0% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(0deg); }
+            50% { border-color: #00bfff; box-shadow: 0 0 40px #ff1493, 0 0 70px #9400d3, inset 0 0 30px #00ffff; }
+            100% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(360deg); }
+        }
+        @keyframes obsidianThroneEpic {
+            0%, 100% { 
+                border-color: #3b0066; 
+                box-shadow: 0 0 25px #150024, 0 0 50px rgba(138, 43, 226, 0.4), inset 0 0 20px #ff3300; 
+                filter: brightness(0.9);
+            }
+            50% { 
+                border-color: #ff3300; 
+                box-shadow: 0 0 40px #4b0082, 0 0 80px rgba(255, 51, 0, 0.6), inset 0 0 35px #9900ff; 
+                filter: brightness(1.25);
+            }
+        }
+        @keyframes divineNimbUltra {
+            0% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(0deg); transform: scale(1); }
+            50% { border-color: #ffffff; box-shadow: 0 0 50px #00ffff, 0 0 90px #ffd700, 0 0 120px #ff00ff, inset 0 0 40px #ffd700; filter: hue-rotate(180deg); transform: scale(1.03); }
+            100% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(360deg); transform: scale(1); }
+        }
+
+        .animated-spin-border {
+            position: relative;
+            overflow: hidden;
+        }
+        .animated-spin-border::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
+            animation: spinGradient 4s linear infinite;
+            z-index: 1;
+        }
+        .animated-spin-border .avatar-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .animated-pulse-glow { animation: pulseGlow 2.5s infinite ease-in-out; }
+        .animated-cryo { animation: cryoPrism 3s infinite ease-in-out; }
+        .animated-fire-pro { animation: fireStormPro 2s infinite ease-in-out; }
+        .animated-singularity { animation: singularityCosmos 6s infinite linear; }
+        .animated-obsidian { animation: obsidianThroneEpic 3s infinite ease-in-out; }
+        .animated-divine-ultra { animation: divineNimbUltra 2.5s infinite ease-in-out; }
+        .animated-neon-pulsar { animation: neonPulse 2s infinite ease-in-out; }
+        .animated-lava-monolith { animation: lavaBreathe 2.5s infinite ease-in-out; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #1e1e1e;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .modal-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #121212;
+            margin: 15px auto;
+            position: relative;
+        }
+        .close-modal {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Профиль -->
+        <div class="card">
+            <h2 id="userName">Флексер</h2>
+            <div class="avatar-container" id="avatarBox">
+                <div class="avatar-inner" id="avatarEmoji">👶</div>
+            </div>
+            <div id="userLevel" style="font-size: 14px; color: var(--tg-theme-hint-color, #aaa);">Уровень 1</div>
+            <div id="userStatus" style="color: #ff4b2b; font-weight: bold; margin-bottom: 10px;">👶 Новичок</div>
+            <div>XP: <span id="userXp" style="font-size: 20px; font-weight: bold;">0</span></div>
+            <div>Звезды: <span id="userStars" style="color: #ffd700; font-weight: bold;">0</span> ⭐️</div>
+        </div>
+
+        <!-- Кликер для фарма XP -->
+        <div class="card">
+            <div style="font-size: 14px; margin-bottom: 5px;">Тапай для разгона хайпа! (+10 XP)</div>
+            <button class="clicker-btn" onclick="tapXp()">🔥</button>
+            <div id="boostStatus" class="boost-status"></div>
+            <button class="btn" id="dailyBtn" onclick="claimDaily()" style="background: #27ae60;">🎁 Забрать бонус (+100 XP)</button>
+        </div>
+
+        <!-- Магазин рамок профиля -->
+        <div class="card" style="text-align: left;">
+            <div class="section-title collapsible-header" onclick="toggleShop()" style="margin-top: 0;">
+                <span>🎨 Магазин рамок</span>
+                <span id="shopArrow" class="arrow-icon">▼</span>
+            </div>
+            <div id="shopContainer">
+                <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin: 8px 0;">XP не тратятся, но за звёзды — покупка полная!</div>
+                <div class="shop-grid" id="shopList"></div>
+            </div>
+        </div>
+
+        <!-- Магазин и Тюнинг -->
+        <div class="card" style="text-align: left;">
+            <div class="section-title" style="margin-top: 0;">Действия & Тюнинг</div>
+            <button class="btn" onclick="buyBoost()">🚀 Ускорить хайп (5 ⭐️)</button>
+            <button class="btn" onclick="spinWheel()" style="background: #8e44ad;">🎰 Колесо удачи (10 000 XP)</button>
+            <button class="btn" onclick="getRefLink()" style="background: #9b59b6;">🎯 Пригласить друга (+20 ⭐️)</button>
+        </div>
+
+        <!-- Сообщить об ошибке / Предложить идею -->
+        <div class="card" style="text-align: left;">
+            <div class="section-title" style="margin-top: 0;">💬 Обратная связь</div>
+            <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa);">Нашёл баг или есть идея? Напиши разработчику!</div>
+            <textarea id="feedbackText" class="feedback-input" rows="3" placeholder="Опиши баг или предложи фичу..."></textarea>
+            <button class="btn" onclick="sendFeedback()" style="background: #16a085;">📤 Отправить</button>
+        </div>
+
+        <!-- Топ чарта -->
+        <div class="section-title">Топ чарта</div>
+        <div class="leaderboard" id="leaderboardList">
+            <div class="leader-item" style="color: var(--tg-theme-hint-color, #aaa);">
+                <span>Топ пока пуст. Стань первым! 🚀</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно предпросмотра рамки -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin: 0; font-size: 16px;">Название рамки</h3>
+            <div class="modal-avatar" id="modalAvatarBox">
+                <div class="modal-avatar-inner" style="font-size: 45px; z-index: 2;">👶</div>
+            </div>
+            <div id="modalPrice" style="font-size: 13px; color: #ffd700; margin-bottom: 5px;">Цена</div>
+            <button class="btn" id="modalActionBtn" onclick="unlockOrEquipFromModal()">Разблокировать</button>
+            <button class="close-modal" onclick="closePreview()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let xp = 0;
+        let stars = 0;
+        let lastClaimTimestamp = 0;
+
+        let tapTimestamps = [];
+        let boostUntil = 0;
+        let lastBoostTriggerTime = 0;
+        let isShopOpen = false;
+
+        const framesData = [
+            { id: 'f_xp_1', name: 'Древесный массив', type: 'xp', price: 1000, css: 'border: 4px solid #8B4513; background: repeating-linear-gradient(45deg, #3d1c02, #3d1c02 10px, #261101 10px, #261101 20px);' },
+            { id: 'f_xp_2', name: 'Шестеренки киборга', type: 'xp', price: 5000, css: 'border: 4px dashed #b87333; background: radial-gradient(circle, #3a2212 20%, #121212 80%);' },
+            { id: 'f_xp_3', name: 'Матричный терминал', type: 'xp', price: 15000, css: 'border: 3px dotted #00ff55; animation: matrixScan 2s infinite;' },
+            { id: 'f_xp_4', name: 'Неоновый пульсар', type: 'xp', price: 40000, specialClass: 'animated-neon-pulsar', css: 'border: 4px double #00ffcc; background: linear-gradient(135deg, #002b3d, #121212);' },
+            { id: 'f_xp_5', name: 'Лавовый монолит', type: 'xp', price: 100000, specialClass: 'animated-lava-monolith', css: 'border: 4px solid #ff2200; background: linear-gradient(135deg, #300, #121212);' },
+            
+            { id: 'f_st_1', name: '⭐️ Астральный Орел', type: 'stars', price: 50, css: 'border: 3px solid #ffaa00; box-shadow: 0 0 20px #ffaa00, inset 0 0 10px #ffaa00; background: radial-gradient(circle, #332200 0%, #121212 80%);' },
+            { id: 'f_st_2', name: '🔮 Аметистовый Фантом', type: 'stars', price: 100, css: 'border: 3px dashed #da70d6; box-shadow: 0 0 20px #9932cc, inset 0 0 15px #da70d6; background: radial-gradient(circle, #2a0033 0%, #121212 80%);' },
+            { id: 'f_st_3', name: '⚡ Кибер-Пулс', type: 'stars', price: 180, specialClass: 'animated-pulse-glow', css: 'border: 3px solid #00ffff; background: linear-gradient(135deg, #002b3d, #121212);' },
+            { id: 'f_st_4', name: '❄️ Крио-Призма', type: 'stars', price: 270, specialClass: 'animated-cryo', css: 'border: 4px solid #00f2fe; background: linear-gradient(135deg, #001f3f, #121212);' },
+            { id: 'f_st_5', name: '👑 Императорское Золото', type: 'stars', price: 400, css: 'border: 4px double #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.6), inset 0 0 20px rgba(255,215,0,0.4); background: radial-gradient(circle, #4d3d00 0%, #121212 75%);' },
+            { id: 'f_st_6', name: '🔥 Огненный Шторм', type: 'stars', price: 550, specialClass: 'animated-fire-pro', css: 'border: 4px solid #ff2a00; background: linear-gradient(135deg, #4d1400, #121212);' },
+            { id: 'f_st_7', name: '🌈 Голографический Спиннер', type: 'stars', price: 750, specialClass: 'animated-spin-border' },
+            { id: 'f_st_8', name: '🌌 Сингулярность Космоса', type: 'stars', price: 1000, specialClass: 'animated-singularity', css: 'border: 4px solid #9400d3; background: radial-gradient(circle, #1a0033 0%, #000 85%);' },
+            { id: 'f_st_9', name: '🖤 Обсидиановый Трон', type: 'stars', price: 1500, specialClass: 'animated-obsidian', css: 'border: 4px solid #220033; background: radial-gradient(circle, #0d001a 0%, #000000 85%);' },
+            { id: 'f_st_10', name: '🏆 Божественный Нимб', type: 'stars', price: 3000, specialClass: 'animated-divine-ultra', css: 'border: 4px solid #ffd700; background: radial-gradient(circle, #3d3000 0%, #121212 80%);' }
+        ];
+
+        let ownedFrames = ['default'];
+        let equippedFrame = 'default';
+        let currentPreviewId = null;
+
+        const levelsData = [
+            "👶 Новичок", "🧢 Зелёный", "🛹 Дворовый", "🎧 Свой парень", "⚡️ Раскачкин", 
+            "🔥 Тусовщик", "🚀 Движовый", "💡 Мастер шума", "😎 Авторитет", "👑 Хайпер",
+            "💬 Вайбер", "📢 Повелитель чатов", "📸 Лентач", "🎯 Трендсеттер", "⭐ Инфлюенсер", 
+            "🧲 Магнит", "🌋 Эпицентр", "🌪 Шторм", "🌊 Цунами", "🏆 Легенда двора",
+            "💻 Кибер-новичок", "🔌 Коннектор", "🤖 Скриптер", "🧠 Генератор", "⚡️ Разгонщик", 
+            "⚙️ Наладчик", "🛠 Архитектор", "🔮 Провидец", "🛡 Страж сети", "💎 Кибер-Флексер",
+            "🌆 Житель мегаполиса", "🏙 Районный бас", "🌃 Ночной охотник", "🌉 Мостовой", "🪩 Клубный король", 
+            "🎇 Иллюминатор", "🎆 Вспышка", "🌠 Комета", "☄️ Метеор", "🌟 Супернова",
+            "🧊 Айсберг", "❄️ Ледник", "🏔 Вершинин", "⛰ Скалолаз", "🧗‍♂️ Альпинист", 
+            "🧗 Peak Boss", "🛸 НЛО", "🛰 Спутник", "🪐 Планетянин", "🌌 Звездный Лорд",
+            "⚔️ Воин хайпа", "🛡 Паладин трендов", "🗡 Рыцарь сети", "👑 Король стримов", "🧙‍♂️ Маг алгоритмов", 
+            "🔮 Заклинатель лайков", "⚗️ Алхимик вайба", "📜 Летописец чата", "🗝 Хранитель кода", "🗿 Монолит",
+            "🔥 Неудержимый", "⚡️ Электрический", "🌪 Буревестник", "🌊 Девятый вал", "🌋 Овердрайв", 
+            "🚀 Гиперзвуковой", "🛸 Варп-драйв", "💫 Сингулярность", "🌌 Бесконечность", "👑 Абсолютный Босс",
+            "🕶 Теневой агент", "🕵️‍♂️ Инсайдер", "💼 Синдикат", "🌐 Глобалист", "📊 Биржевой демон", 
+            "📈 Бык трендов", "🦈 Акула хайпа", "🦁 Лев чата", "🐅 Тигр алгоритмов", "🐉 Дракон сети",
+            "🦾 Терминатор", "🤖 Киборг", "⚙️ Механоид", "🧬 Мутант стиля", "🧪 Инициатор", 
+            "⚛️ Квантовый флексер", "🔬 Профессор хайпа", "🎓 Академик вайба", "🏆 Грандмастер", "👑 Икона стиля",
+            "🌟 Небожитель", "⚡️ Полубог", "🪐 Титан космоса", "🌌 Повелитель Галактики", "🌀 Повелитель Времени",
+            "🔥 Повелитель Хаоса", "💎 Кристальный Бог", "👑 Властелин Вселенной", "🏆 Легенда Вечности", "🪐 Бог Флекса"
+        ];
+
+        function getLevelAndRank(currentXp) {
+            let level = 1;
+            let currentReq = 150; 
+            let accumulatedXp = 150;
+
+            while (currentXp >= accumulatedXp && level < 100) {
+                level++;
+                currentReq = Math.round(currentReq * 1.15) + 25; 
+                accumulatedXp += currentReq;
+            }
+
+            let rankIndex = Math.min(level - 1, levelsData.length - 1);
+            return { level, rank: levelsData[rankIndex] };
+        }
+
+        function toggleShop() {
+            isShopOpen = !isShopOpen;
+            const shopList = document.getElementById('shopList');
+            const shopArrow = document.getElementById('shopArrow');
+            if (isShopOpen) {
+                shopList.classList.remove('hidden');
+                shopArrow.classList.remove('collapsed');
+            } else {
+                shopList.classList.add('hidden');
+                shopArrow.classList.add('collapsed');
+            }
+        }
+
+        function saveData() {
+            if (tg.CloudStorage) {
+                tg.CloudStorage.setItem('flex_xp', xp.toString());
+                tg.CloudStorage.setItem('flex_stars', stars.toString());
+                tg.CloudStorage.setItem('flex_last_claim', lastClaimTimestamp.toString());
+                tg.CloudStorage.setItem('flex_owned_frames', JSON.stringify(ownedFrames));
+                tg.CloudStorage.setItem('flex_equipped_frame', equippedFrame);
+            }
+            localStorage.setItem('flex_xp_backup', xp.toString());
+            localStorage.setItem('flex_stars_backup', stars.toString());
+            localStorage.setItem('flex_last_claim_backup', lastClaimTimestamp.toString());
+            localStorage.setItem('flex_owned_frames_backup', JSON.stringify(ownedFrames));
+            localStorage.setItem('flex_equipped_frame_backup', equippedFrame);
+        }
+
+        function checkDailyStatus() {
+            const now = new Date();
+            let target8amToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0).getTime();
+            if (now.getTime() < target8amToday) {
+                target8amToday -= 24 * 60 * 60 * 1000;
+            }
+
+            const btn = document.getElementById('dailyBtn');
+
+            if (lastClaimTimestamp >= target8amToday) {
+                btn.innerText = "⏳ Бонус уже получен (сброс в 08:00)";
+                btn.disabled = true;
+            } else {
+                btn.innerText = "🎁 Забрать бонус (+100 XP)";
+                btn.disabled = false;
+            }
+        }
+
+        function renderShop() {
+            const list = document.getElementById('shopList');
+            let html = `
+                <div class="shop-item">
+                    <div class="shop-info" onclick="openPreview('default')">
+                        <span class="shop-name">⚪️ Стандартный обод</span>
+                        <span class="shop-price">Доступно</span>
+                    </div>
+                    <div class="shop-actions">
+                        <button class="preview-btn" onclick="openPreview('default')">👁</button>
+                        <button class="shop-btn ${equippedFrame === 'default' ? 'equipped' : ''}" onclick="equipFrame('default')">
+                            ${equippedFrame === 'default' ? 'Надета' : 'Надеть'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            framesData.forEach(f => {
+                const isOwned = ownedFrames.includes(f.id);
+                const isEquipped = equippedFrame === f.id;
+                const canUnlock = (f.type === 'xp' ? xp >= f.price : stars >= f.price);
+
+                let btnText = isOwned ? (isEquipped ? 'Надета' : 'Надеть') : (canUnlock ? 'Купить' : 'Закрыто');
+                let btnClass = isEquipped ? 'equipped' : (!isOwned && !canUnlock ? 'locked' : '');
+
+                html += `
+                    <div class="shop-item">
+                        <div class="shop-info" onclick="openPreview('${f.id}')">
+                            <span class="shop-name">${f.name}</span>
+                            <span class="shop-price">Цена: ${f.price} ${f.type === 'xp' ? 'XP (без списания)' : '⭐️'}</span>
+                        </div>
+                        <div class="shop-actions">
+                            <button class="preview-btn" onclick="openPreview('${f.id}')">👁</button>
+                            <button class="shop-btn ${btnClass}" onclick="unlockOrEquipFrame('${f.id}')">
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        function openPreview(id) {
+            currentPreviewId = id;
+            const modal = document.getElementById('previewModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalAvatarBox = document.getElementById('modalAvatarBox');
+            const modalPrice = document.getElementById('modalPrice');
+            const modalActionBtn = document.getElementById('modalActionBtn');
+
+            if (id === 'default') {
+                modalTitle.innerText = 'Стандартный обод';
+                modalAvatarBox.className = 'modal-avatar';
+                modalAvatarBox.style.cssText = "width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff416c, #ff4b2b); box-shadow: 0 0 20px rgba(255, 75, 43, 0.4); margin: 15px auto; position: relative;";
+                modalPrice.innerText = 'Базовая рамка';
+                modalActionBtn.innerText = equippedFrame === 'default' ? 'Уже надета' : 'Надеть';
+                modalActionBtn.disabled = equippedFrame === 'default';
+            } else {
+                const f = framesData.find(item => item.id === id);
+                if (!f) return;
+                modalTitle.innerText = f.name;
+                
+                modalAvatarBox.className = 'modal-avatar ' + (f.specialClass || '');
+                modalAvatarBox.style.cssText = `width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #121212; ${f.css || ''} margin: 15px auto; position: relative; overflow: hidden;`;
+                
+                modalPrice.innerText = f.type === 'xp' ? `Нужно: ${f.price} XP (очки не списываются)` : `Стоимость: ${f.price} ⭐️`;
+                
+                const isOwned = ownedFrames.includes(f.id);
+                const isEquipped = equippedFrame === f.id;
+                const canUnlock = (f.type === 'xp' ? xp >= f.price : stars >= f.price);
+                
+                if (isEquipped) {
+                    modalActionBtn.innerText = 'Уже надета';
+                    modalActionBtn.disabled = true;
+                } else if (isOwned) {
+                    modalActionBtn.innerText = 'Надеть';
+                    modalActionBtn.disabled = false;
+                } else if (canUnlock) {
+                    modalActionBtn.innerText = f.type === 'xp' ? 'Разблокировать' : 'Купить';
+                    modalActionBtn.disabled = false;
+                } else {
+                    modalActionBtn.innerText = 'Недостаточно средств';
+                    modalActionBtn.disabled = true;
+                }
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function unlockOrEquipFromModal() {
+            if (!currentPreviewId) return;
+            if (currentPreviewId === 'default') {
+                equipFrame('default');
+            } else {
+                unlockOrEquipFrame(currentPreviewId);
+            }
+            openPreview(currentPreviewId);
+        }
+
+        function unlockOrEquipFrame(id) {
+            const frame = framesData.find(f => f.id === id);
+            if (!frame) return;
+
+            if (ownedFrames.includes(id)) {
+                equippedFrame = id;
+            } else {
+                const canUnlock = (frame.type === 'xp' ? xp >= frame.price : stars >= frame.price);
+                if (canUnlock) {
+                    if (frame.type === 'stars') {
+                        stars -= frame.price;
+                    }
+                    ownedFrames.push(id);
+                    equippedFrame = id;
+                } else {
+                    alert(frame.type === 'xp' ? 'Недостаточно XP!' : 'Недостаточно звезд!');
+                }
+            }
+            updateUI();
+        }
+
+        function equipFrame(id) {
+            equippedFrame = id;
+            updateUI();
+        }
+
+        function updateUI() {
+            const { level, rank } = getLevelAndRank(xp);
+            
+            document.getElementById('userXp').innerText = xp;
+            document.getElementById('userStars').innerText = stars;
+            document.getElementById('userLevel').innerText = `Уровень ${level}`;
+            document.getElementById('userStatus').innerText = rank;
+
+            const avatarBox = document.getElementById('avatarBox');
+            const avatarEmoji = document.getElementById('avatarEmoji');
+            
+            if (equippedFrame === 'default') {
+                avatarBox.className = 'avatar-container';
+                avatarBox.style.cssText = "width: 96px; height: 96px; margin: 10px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff416c, #ff4b2b); box-shadow: 0 0 20px rgba(255, 75, 43, 0.4); position: relative;";
+            } else {
+                const fData = framesData.find(f => f.id === equippedFrame);
+                if (fData) {
+                    avatarBox.className = 'avatar-container ' + (fData.specialClass || '');
+                    avatarBox.style.cssText = `width: 96px; height: 96px; margin: 10px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #121212; ${fData.css || ''} position: relative; overflow: hidden;`;
+                }
+            }
+
+            if (level < 20) {
+                avatarEmoji.innerText = "👶";
+            } else if (level < 50) {
+                avatarEmoji.innerText = "⚡️";
+            } else if (level < 80) {
+                avatarEmoji.innerText = "🦾";
+            } else {
+                avatarEmoji.innerText = "🪐";
+            }
+
+            if (xp > 0) {
+                document.getElementById('leaderboardList').innerHTML = `
+                    <div class="leader-item">
+                        <span>1. 👑 Вы</span>
+                        <b style="color: #ffd700;">${xp} XP (${rank})</b>
+                    </div>
+                `;
+            }
+
+            renderShop();
+            
+            const shopList = document.getElementById('shopList');
+            const shopArrow = document.getElementById('shopArrow');
+            if (isShopOpen) {
+                shopList.classList.remove('hidden');
+                shopArrow.classList.remove('collapsed');
+            } else {
+                shopList.classList.add('hidden');
+                shopArrow.classList.add('collapsed');
+            }
+
+            saveData();
+            checkDailyStatus();
+        }
+
+        function updateBoostTimer() {
+            const now = Date.now();
+            const boostEl = document.getElementById('boostStatus');
+            if (boostUntil > now) {
+                const timeLeft = Math.ceil((boostUntil - now) / 1000);
+                boostEl.innerText = `🔥 БУСТ АКТИВЕН (+25 XP): ${timeLeft}с`;
+                boostEl.style.display = 'block';
+            } else {
+                boostEl.innerText = '';
+                boostEl.style.display = 'none';
+            }
+        }
+
+        function tapXp() {
+            const now = Date.now();
+            
+            tapTimestamps = tapTimestamps.filter(t => now - t < 1000);
+            if (tapTimestamps.length > 20) {
+                if (now - lastBoostTriggerTime > 3000) {
+                    alert("Слишком быстро! Подожди секунду.");
+                    lastBoostTriggerTime = now;
+                }
+                return;
+            }
+            tapTimestamps.push(now);
+
+            // Базово 10 XP за клик, под бустом +25 XP
+            let gain = 10;
+            if (boostUntil > now) {
+                gain = 25;
+            }
+
+            xp += gain;
+
+            const avatarBox = document.getElementById('avatarBox');
+            avatarBox.classList.add('pulse');
+            setTimeout(() => {
+                avatarBox.classList.remove('pulse');
+            }, 100);
+
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+
+            updateUI();
+        }
+
+        function claimDaily() {
+            const now = Date.now();
+            let target8amToday = new Date(new Date().setHours(8, 0, 0, 0)).getTime();
+            if (now < target8amToday) {
+                target8amToday -= 24 * 60 * 60 * 1000;
+            }
+
+            if (lastClaimTimestamp >= target8amToday) {
+                alert("Бонус на сегодня уже получен! Жди сброса в 08:00.");
+                return;
+            }
+
+            xp += 100;
+            lastClaimTimestamp = now;
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+            updateUI();
+            alert("🎁 Бонус успешно получен (+100 XP)!");
+        }
+
+        function buyBoost() {
+            if (stars >= 5) {
+                stars -= 5;
+                boostUntil = Date.now() + 60 * 1000;
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+                updateUI();
+                alert("🚀 Ускорение хайпа активировано на 60 секунд! Теперь +25 XP за тап.");
+            } else {
+                alert("Недостаточно звезд! Приглашай друзей или выполняй задачи.");
+            }
+        }
+
+        function spinWheel() {
+            if (xp >= 10000) {
+                xp -= 10000;
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+                
+                const isLucky = Math.random() < 0.05;
+                
+                if (isLucky) {
+                    stars += 10;
+                    updateUI();
+                    alert("🎰 Джекпот! Колесо удачи выдало супер-приз: 🌟 +10 звёзд!");
+                } else {
+                    const consolationPrizes = [
+                        { val: 2000, text: '+2 000 XP' },
+                        { val: 5000, text: '+5 000 XP' },
+                        { val: 8000, text: '+8 000 XP' },
+                        { val: 12000, text: '+12 000 XP (Окупилось!)' }
+                    ];
+                    const won = consolationPrizes[Math.floor(Math.random() * consolationPrizes.length)];
+                    xp += won.val;
+                    updateUI();
+                    alert(`🎰 Колесо прокрутилось! Твой утешительный приз: ${won.text}`);
+                }
+            } else {
+                alert("Недостаточно XP для вращения колеса (нужно 10 000 XP).");
+            }
+        }
+
+        function getRefLink() {
+            const userId = tg.initDataUnsafe?.user?.id || 'player';
+            const botUsername = 'super_flex_bot';
+            const refUrl = `https://t.me/${botUsername}?start=ref_${userId}`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(refUrl).then(() => {
+                    alert("🔗 Реферальная ссылка скопирована в буфер обмена!\n\n" + refUrl);
+                }).catch(() => {
+                    prompt("Твоя реферальная ссылка:", refUrl);
+                });
+            } else {
+                prompt("Твоя реферальная ссылка:", refUrl);
+            }
+        }
+
+        function sendFeedback() {
+    const text = document.getElementById('feedbackText').value.trim();
+    if (!text) {
+        alert("Поле ввода пустое! Напиши свой отзыв или идею.");
+        return;
+    }
+    
+    // Получаем объект WebApp безопасно
+    const webApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    if (webApp && typeof webApp.sendData === 'function') {
+        // Упаковываем в JSON и отправляем боту (при этом мини-приложение закроется и откроется чат с ботом)
+        webApp.sendData(JSON.stringify({ action: 'feedback', message: text }));
+    } else {
+        // Если запущено не в Telegram (например, в обычном браузере для теста)
+        alert("✅ Спасибо за отзыв! Твое сообщение передано разработчику (тестовый режим).");
+        console.log("Mock sendData:", text);
+    }
+    
+    document.getElementById('feedbackText').value = '';
+}
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (tg.CloudStorage) {
+                tg.CloudStorage.getItem('flex_xp', (err, val) => {
+                    if (!err && val) {
+                        xp = parseInt(val) || 0;
+                        stars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
+                        lastClaimTimestamp = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
+                        try {
+                            ownedFrames = JSON.parse(localStorage.getItem('flex_owned_frames_backup')) || ['default'];
+                            equippedFrame = localStorage.getItem('flex_equipped_frame_backup') || 'default';
+                        } catch(e) {}
+                        updateUI();
+                    }
+                });
+            }
+            
+            xp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
+            stars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
+            lastClaimTimestamp = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
+            try {
+                const savedFrames = localStorage.getItem('flex_owned_frames_backup');
+                if (savedFrames) ownedFrames = JSON.parse(savedFrames);
+                const savedEq = localStorage.getItem('flex_equipped_frame_backup');
+                if (savedEq) equippedFrame = savedEq;
+            } catch(e) {}
+
+            updateUI();
+            setInterval(updateBoostTimer, 500);
+        });
+    </script>
+</body>
+</html>
