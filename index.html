@@ -876,26 +876,31 @@
             }
         }
 
-        function sendFeedback() {
-            const textarea = document.getElementById('feedbackText');
-            const text = textarea.value.trim();
-            
-            if (!text) {
-                alert("Поле ввода пустое!");
-                return;
-            }
-            
-            const payload = JSON.stringify({ action: 'feedback', message: text });
+     function sendFeedback() {
+    const textarea = document.getElementById('feedbackText');
+    const text = textarea.value.trim();
+    
+    if (!text) {
+        alert("Поле ввода пустое!");
+        return;
+    }
+    
+    // Юзернейм вашего бота (сюда будут приходить отзывы)
+    const botUsername = 'super_flex_bot'; 
+    const messageText = encodeURIComponent(`💬 Отзыв / Баг от игрока:\n\n${text}`);
+    
+    // Ссылка, которая открывает чат с ботом и автоматически подставляет текст сообщения
+    const telegramUrl = `https://t.me/${botUsername}?text=${messageText}`;
 
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
-                window.Telegram.WebApp.sendData(payload);
-            } else {
-                alert("✅ Спасибо! (В браузере Telegram.WebApp.sendData недоступен, но текст зафиксирован)");
-                console.log("Feedback sent:", text);
-            }
-            
-            textarea.value = '';
-        }
+    // Пробуем открыть через официальный метод Telegram или как обычную ссылку
+    if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+        window.Telegram.WebApp.openTelegramLink(telegramUrl);
+    } else {
+        window.open(telegramUrl, '_blank');
+    }
+    
+    textarea.value = '';
+}
 
         window.addEventListener('DOMContentLoaded', () => {
             if (tg.CloudStorage) {
