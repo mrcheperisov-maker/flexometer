@@ -451,9 +451,7 @@
         let stars = 0;
         let lastClaimTimestamp = 0;
 
-        let tapTimestamps = [];
         let boostUntil = 0;
-        let lastBoostTriggerTime = 0;
         let isShopOpen = false;
 
         const framesData = [
@@ -530,21 +528,45 @@
             }
         }
 
-        // Загрузка данных из облака Telegram с фоллбэком на localStorage
+        // УМНАЯ загрузка данных (синхронизация облака и локального кэша)
         function loadData() {
+            const localXp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
+            const localStars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
+            const localClaim = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
+            const localEq = localStorage.getItem('flex_equipped_frame_backup') || 'default';
+            
+            let localFrames = ['default'];
+            try {
+                const frames = JSON.parse(localStorage.getItem('flex_owned_frames_backup'));
+                if (frames) localFrames = frames;
+            } catch(e){}
+
             if (tg.CloudStorage) {
-                tg.CloudStorage.getItem('flex_xp', (err, val) => {
-                    if (!err && val !== null) xp = parseInt(val) || 0;
-                    tg.CloudStorage.getItem('flex_stars', (err2, val2) => {
-                        if (!err2 && val2 !== null) stars = parseInt(val2) || 0;
-                        tg.CloudStorage.getItem('flex_last_claim', (err3, val3) => {
-                            if (!err3 && val3 !== null) lastClaimTimestamp = parseInt(val3) || 0;
-                            tg.CloudStorage.getItem('flex_owned_frames', (err4, val4) => {
-                                if (!err4 && val4) {
-                                    try { ownedFrames = JSON.parse(val4); } catch(e){}
+                tg.CloudStorage.getItem('flex_xp', (err, cloudXpVal) => {
+                    const cloudXp = (!err && cloudXpVal !== null) ? parseInt(cloudXpVal) || 0 : 0;
+                    
+                    tg.CloudStorage.getItem('flex_stars', (err2, cloudStarsVal) => {
+                        const cloudStars = (!err2 && cloudStarsVal !== null) ? parseInt(cloudStarsVal) || 0 : 0;
+                        
+                        tg.CloudStorage.getItem('flex_last_claim', (err3, cloudClaimVal) => {
+                            const cloudClaim = (!err3 && cloudClaimVal !== null) ? parseInt(cloudClaimVal) || 0 : 0;
+
+                            tg.CloudStorage.getItem('flex_owned_frames', (err4, cloudFramesVal) => {
+                                let cloudFrames = ['default'];
+                                if (!err4 && cloudFramesVal) {
+                                    try { cloudFrames = JSON.parse(cloudFramesVal); } catch(e){}
                                 }
-                                tg.CloudStorage.getItem('flex_equipped_frame', (err5, val5) => {
-                                    if (!err5 && val5) equippedFrame = val5;
+
+                                tg.CloudStorage.getItem('flex_equipped_frame', (err5, cloudEqVal) => {
+                                    const cloudEq = (!err5 && cloudEqVal) ? cloudEqVal : 'default';
+
+                                    xp = Math.max(localXp, cloudXp);
+                                    stars = Math.max(localStars, cloudStars);
+                                    lastClaimTimestamp = Math.max(localClaim, cloudClaim);
+                                    ownedFrames = Array.from(new Set([...localFrames, ...cloudFrames]));
+                                    equippedFrame = cloudEq !== 'default' ? cloudEq : localEq;
+
+                                    saveData();
                                     updateUI();
                                     renderShop();
                                     checkDailyStatus();
@@ -554,16 +576,11 @@
                     });
                 });
             } else {
-                // Если облако недоступно, берем из localStorage
-                xp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
-                stars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
-                lastClaimTimestamp = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
-                try {
-                    const frames = JSON.parse(localStorage.getItem('flex_owned_frames_backup'));
-                    if (frames) ownedFrames = frames;
-                } catch(e){}
-                const eq = localStorage.getItem('flex_equipped_frame_backup');
-                if (eq) equippedFrame = eq;
+                xp = localXp;
+                stars = localStars;
+                lastClaimTimestamp = localClaim;
+                ownedFrames = localFrames;
+                equippedFrame = localEq;
 
                 updateUI();
                 renderShop();
@@ -625,7 +642,7 @@
         function tapXp() {
             let addAmount = 10;
             if (Date.now() < boostUntil) {
-                addAmount = 20; // x2 буст
+                addAmount = 20;
             }
             xp += addAmount;
             saveData();
@@ -637,7 +654,7 @@
         function buyBoost() {
             if (stars >= 5) {
                 stars -= 5;
-                boostUntil = Date.now() + 5 * 60 * 1000; // 5 минут буста
+                boostUntil = Date.now() + 5 * 60 * 1000;
                 saveData();
                 updateUI();
                 renderShop();
@@ -650,7 +667,7 @@
         function spinWheel() {
             if (xp >= 10000) {
                 xp -= 10000;
-                const rewardStars = Math.floor(Math.random() * 20) + 5; // От 5 до 24 звезд
+                const rewardStars = Math.floor(Math.random() * 20) + 5;
                 stars += rewardStars;
                 saveData();
                 updateUI();
@@ -674,19 +691,24 @@
             }
         }
 
+        // ИСПРАВЛЕНА ОТПРАВКА С ТЕЛЕФОНА: отправка через sendData + принудительное закрытие tg.close()
         function sendFeedback() {
             const text = document.getElementById('feedbackText').value.trim();
             if (!text) {
                 alert('Введите текст сообщения!');
                 return;
             }
-            // Отправка через Telegram sendData если открыто как WebApp, либо просто очистка
+            
             if (tg.sendData) {
                 tg.sendData(JSON.stringify({ type: 'feedback', text: text }));
+                // Принудительно закрываем приложение, чтобы Telegram гарантированно передал web_app_data боту на мобильных устройствах
+                if (typeof tg.close === 'function') {
+                    tg.close();
+                }
             } else {
                 alert('Спасибо за отзыв! Сообщение отправлено разработчику.');
+                document.getElementById('feedbackText').value = '';
             }
-            document.getElementById('feedbackText').value = '';
         }
 
         function renderShop() {
@@ -804,7 +826,7 @@
                     if (frame.type === 'stars') {
                         stars -= frame.price;
                     }
-                    ownedFrames.push(id);
+                    if (!ownedFrames.includes(id)) ownedFrames.push(id);
                     equippedFrame = id;
                 } else {
                     alert(frame.type === 'xp' ? 'Недостаточно XP!' : 'Недостаточно звезд!');
@@ -835,7 +857,6 @@
                 document.getElementById('userName').innerText = user.first_name || 'Флексер';
             }
 
-            // Применяем рамку к аватару на главном экране
             const avatarBox = document.getElementById('avatarBox');
             if (equippedFrame === 'default') {
                 avatarBox.className = 'avatar-container';
@@ -849,7 +870,7 @@
             }
         }
 
-        // Запускаем загрузку данных при открытии приложения
+        // Запуск загрузки при открытии
         loadData();
     </script>
 </body>
