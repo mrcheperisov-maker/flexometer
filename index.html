@@ -530,6 +530,47 @@
             }
         }
 
+        // Загрузка данных из облака Telegram с фоллбэком на localStorage
+        function loadData() {
+            if (tg.CloudStorage) {
+                tg.CloudStorage.getItem('flex_xp', (err, val) => {
+                    if (!err && val !== null) xp = parseInt(val) || 0;
+                    tg.CloudStorage.getItem('flex_stars', (err2, val2) => {
+                        if (!err2 && val2 !== null) stars = parseInt(val2) || 0;
+                        tg.CloudStorage.getItem('flex_last_claim', (err3, val3) => {
+                            if (!err3 && val3 !== null) lastClaimTimestamp = parseInt(val3) || 0;
+                            tg.CloudStorage.getItem('flex_owned_frames', (err4, val4) => {
+                                if (!err4 && val4) {
+                                    try { ownedFrames = JSON.parse(val4); } catch(e){}
+                                }
+                                tg.CloudStorage.getItem('flex_equipped_frame', (err5, val5) => {
+                                    if (!err5 && val5) equippedFrame = val5;
+                                    updateUI();
+                                    renderShop();
+                                    checkDailyStatus();
+                                });
+                            });
+                        });
+                    });
+                });
+            } else {
+                // Если облако недоступно, берем из localStorage
+                xp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
+                stars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
+                lastClaimTimestamp = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
+                try {
+                    const frames = JSON.parse(localStorage.getItem('flex_owned_frames_backup'));
+                    if (frames) ownedFrames = frames;
+                } catch(e){}
+                const eq = localStorage.getItem('flex_equipped_frame_backup');
+                if (eq) equippedFrame = eq;
+
+                updateUI();
+                renderShop();
+                checkDailyStatus();
+            }
+        }
+
         function saveData() {
             if (tg.CloudStorage) {
                 tg.CloudStorage.setItem('flex_xp', xp.toString());
@@ -561,6 +602,91 @@
                 btn.innerText = "🎁 Забрать бонус (+100 XP)";
                 btn.disabled = false;
             }
+        }
+
+        function claimDaily() {
+            const now = new Date();
+            let target8amToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0).getTime();
+            if (now.getTime() < target8amToday) {
+                target8amToday -= 24 * 60 * 60 * 1000;
+            }
+
+            if (lastClaimTimestamp < target8amToday) {
+                xp += 100;
+                lastClaimTimestamp = now.getTime();
+                saveData();
+                checkDailyStatus();
+                updateUI();
+                renderShop();
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        function tapXp() {
+            let addAmount = 10;
+            if (Date.now() < boostUntil) {
+                addAmount = 20; // x2 буст
+            }
+            xp += addAmount;
+            saveData();
+            updateUI();
+            renderShop();
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function buyBoost() {
+            if (stars >= 5) {
+                stars -= 5;
+                boostUntil = Date.now() + 5 * 60 * 1000; // 5 минут буста
+                saveData();
+                updateUI();
+                renderShop();
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                alert('Недостаточно звезд для буста!');
+            }
+        }
+
+        function spinWheel() {
+            if (xp >= 10000) {
+                xp -= 10000;
+                const rewardStars = Math.floor(Math.random() * 20) + 5; // От 5 до 24 звезд
+                stars += rewardStars;
+                saveData();
+                updateUI();
+                renderShop();
+                alert(`Колесо удачи сыграно! Вы выиграли ${rewardStars} звезд! ⭐️`);
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                alert('Нужно минимум 10 000 XP для вращения колеса!');
+            }
+        }
+
+        function getRefLink() {
+            const botUsername = "super_flex_bot";
+            const refUrl = `https://t.me/${botUsername}?start=ref_${tg.initDataUnsafe?.user?.id || 'user'}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(refUrl).then(() => {
+                    alert('Реферальная ссылка скопирована в буфер обмена!');
+                });
+            } else {
+                prompt('Ваша реферальная ссылка:', refUrl);
+            }
+        }
+
+        function sendFeedback() {
+            const text = document.getElementById('feedbackText').value.trim();
+            if (!text) {
+                alert('Введите текст сообщения!');
+                return;
+            }
+            // Отправка через Telegram sendData если открыто как WebApp, либо просто очистка
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify({ type: 'feedback', text: text }));
+            } else {
+                alert('Спасибо за отзыв! Сообщение отправлено разработчику.');
+            }
+            document.getElementById('feedbackText').value = '';
         }
 
         function renderShop() {
@@ -684,12 +810,16 @@
                     alert(frame.type === 'xp' ? 'Недостаточно XP!' : 'Недостаточно звезд!');
                 }
             }
+            saveData();
             updateUI();
+            renderShop();
         }
 
         function equipFrame(id) {
             equippedFrame = id;
+            saveData();
             updateUI();
+            renderShop();
         }
 
         function updateUI() {
@@ -700,237 +830,27 @@
             document.getElementById('userLevel').innerText = `Уровень ${level}`;
             document.getElementById('userStatus').innerText = rank;
 
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                document.getElementById('userName').innerText = user.first_name || 'Флексер';
+            }
+
+            // Применяем рамку к аватару на главном экране
             const avatarBox = document.getElementById('avatarBox');
-            const avatarEmoji = document.getElementById('avatarEmoji');
-            
             if (equippedFrame === 'default') {
                 avatarBox.className = 'avatar-container';
-                avatarBox.style.cssText = "width: 96px; height: 96px; margin: 10px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff416c, #ff4b2b); box-shadow: 0 0 20px rgba(255, 75, 43, 0.4); position: relative;";
+                avatarBox.style.cssText = '';
             } else {
-                const fData = framesData.find(f => f.id === equippedFrame);
-                if (fData) {
-                    avatarBox.className = 'avatar-container ' + (fData.specialClass || '');
-                    avatarBox.style.cssText = `width: 96px; height: 96px; margin: 10px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #121212; ${fData.css || ''} position: relative; overflow: hidden;`;
+                const f = framesData.find(item => item.id === equippedFrame);
+                if (f) {
+                    avatarBox.className = 'avatar-container ' + (f.specialClass || '');
+                    avatarBox.style.cssText = `background: #121212; ${f.css || ''}`;
                 }
             }
-
-            if (level < 20) {
-                avatarEmoji.innerText = "👶";
-            } else if (level < 50) {
-                avatarEmoji.innerText = "⚡️";
-            } else if (level < 80) {
-                avatarEmoji.innerText = "🦾";
-            } else {
-                avatarEmoji.innerText = "🪐";
-            }
-
-            if (xp > 0) {
-                document.getElementById('leaderboardList').innerHTML = `
-                    <div class="leader-item">
-                        <span>1. 👑 Вы</span>
-                        <b style="color: #ffd700;">${xp} XP (${rank})</b>
-                    </div>
-                `;
-            }
-
-            renderShop();
-            
-            const shopList = document.getElementById('shopList');
-            const shopArrow = document.getElementById('shopArrow');
-            if (isShopOpen) {
-                shopList.classList.remove('hidden');
-                shopArrow.classList.remove('collapsed');
-            } else {
-                shopList.classList.add('hidden');
-                shopArrow.classList.add('collapsed');
-            }
-
-            saveData();
-            checkDailyStatus();
         }
 
-        function updateBoostTimer() {
-            const now = Date.now();
-            const boostEl = document.getElementById('boostStatus');
-            if (boostUntil > now) {
-                const timeLeft = Math.ceil((boostUntil - now) / 1000);
-                boostEl.innerText = `🔥 БУСТ АКТИВЕН (+25 XP): ${timeLeft}с`;
-                boostEl.style.display = 'block';
-            } else {
-                boostEl.innerText = '';
-                boostEl.style.display = 'none';
-            }
-        }
-
-        function tapXp() {
-            const now = Date.now();
-            
-            tapTimestamps = tapTimestamps.filter(t => now - t < 1000);
-            if (tapTimestamps.length > 20) {
-                if (now - lastBoostTriggerTime > 3000) {
-                    alert("Слишком быстро! Подожди секунду.");
-                    lastBoostTriggerTime = now;
-                }
-                return;
-            }
-            tapTimestamps.push(now);
-
-            let gain = 10;
-            if (boostUntil > now) {
-                gain = 25;
-            }
-
-            xp += gain;
-
-            const avatarBox = document.getElementById('avatarBox');
-            avatarBox.classList.add('pulse');
-            setTimeout(() => {
-                avatarBox.classList.remove('pulse');
-            }, 100);
-
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
-            }
-
-            updateUI();
-        }
-
-        function claimDaily() {
-            const now = Date.now();
-            let target8amToday = new Date(new Date().setHours(8, 0, 0, 0)).getTime();
-            if (now < target8amToday) {
-                target8amToday -= 24 * 60 * 60 * 1000;
-            }
-
-            if (lastClaimTimestamp >= target8amToday) {
-                alert("Бонус на сегодня уже получен! Жди сброса в 08:00.");
-                return;
-            }
-
-            xp += 100;
-            lastClaimTimestamp = now;
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-            updateUI();
-            alert("🎁 Бонус успешно получен (+100 XP)!");
-        }
-
-        function buyBoost() {
-            if (stars >= 5) {
-                stars -= 5;
-                boostUntil = Date.now() + 60 * 1000;
-                if (tg.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-                updateUI();
-                alert("🚀 Ускорение хайпа активировано на 60 секунд! Теперь +25 XP за тап.");
-            } else {
-                alert("Недостаточно звезд! Приглашай друзей или выполняй задачи.");
-            }
-        }
-
-        function spinWheel() {
-            if (xp >= 10000) {
-                xp -= 10000;
-                if (tg.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-                
-                const isLucky = Math.random() < 0.05;
-                
-                if (isLucky) {
-                    stars += 10;
-                    updateUI();
-                    alert("🎰 Джекпот! Колесо удачи выдало супер-приз: 🌟 +10 звёзд!");
-                } else {
-                    const consolationPrizes = [
-                        { val: 2000, text: '+2 000 XP' },
-                        { val: 5000, text: '+5 000 XP' },
-                        { val: 8000, text: '+8 000 XP' },
-                        { val: 12000, text: '+12 000 XP (Окупилось!)' }
-                    ];
-                    const won = consolationPrizes[Math.floor(Math.random() * consolationPrizes.length)];
-                    xp += won.val;
-                    updateUI();
-                    alert(`🎰 Колесо прокрутилось! Твой утешительный приз: ${won.text}`);
-                }
-            } else {
-                alert("Недостаточно XP для вращения колеса (нужно 10 000 XP).");
-            }
-        }
-
-        function getRefLink() {
-            const userId = tg.initDataUnsafe?.user?.id || 'player';
-            const botUsername = 'super_flex_bot';
-            const refUrl = `https://t.me/${botUsername}?start=ref_${userId}`;
-
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(refUrl).then(() => {
-                    alert("🔗 Реферальная ссылка скопирована в буфер обмена!\n\n" + refUrl);
-                }).catch(() => {
-                    prompt("Твоя реферальная ссылка:", refUrl);
-                });
-            } else {
-                prompt("Твоя реферальная ссылка:", refUrl);
-            }
-        }
-
-     function sendFeedback() {
-    const textarea = document.getElementById('feedbackText');
-    const text = textarea.value.trim();
-    
-    if (!text) {
-        alert("Поле ввода пустое!");
-        return;
-    }
-    
-    // Юзернейм вашего бота (сюда будут приходить отзывы)
-    const botUsername = 'super_flex_bot'; 
-    const messageText = encodeURIComponent(`💬 Отзыв / Баг от игрока:\n\n${text}`);
-    
-    // Ссылка, которая открывает чат с ботом и автоматически подставляет текст сообщения
-    const telegramUrl = `https://t.me/${botUsername}?text=${messageText}`;
-
-    // Пробуем открыть через официальный метод Telegram или как обычную ссылку
-    if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
-        window.Telegram.WebApp.openTelegramLink(telegramUrl);
-    } else {
-        window.open(telegramUrl, '_blank');
-    }
-    
-    textarea.value = '';
-}
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (tg.CloudStorage) {
-                tg.CloudStorage.getItem('flex_xp', (err, val) => {
-                    if (!err && val) {
-                        xp = parseInt(val) || 0;
-                        stars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
-                        lastClaimTimestamp = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
-                        try {
-                            ownedFrames = JSON.parse(localStorage.getItem('flex_owned_frames_backup')) || ['default'];
-                            equippedFrame = localStorage.getItem('flex_equipped_frame_backup') || 'default';
-                        } catch(e) {}
-                        updateUI();
-                    }
-                });
-            }
-            
-            xp = parseInt(localStorage.getItem('flex_xp_backup')) || 0;
-            stars = parseInt(localStorage.getItem('flex_stars_backup')) || 0;
-            lastClaimTimestamp = parseInt(localStorage.getItem('flex_last_claim_backup')) || 0;
-            try {
-                const savedFrames = localStorage.getItem('flex_owned_frames_backup');
-                if (savedFrames) ownedFrames = JSON.parse(savedFrames);
-                const savedEq = localStorage.getItem('flex_equipped_frame_backup');
-                if (savedEq) equippedFrame = savedEq;
-            } catch(e) {}
-
-            updateUI();
-            setInterval(updateBoostTimer, 500);
-        });
+        // Запускаем загрузку данных при открытии приложения
+        loadData();
     </script>
 </body>
 </html>
