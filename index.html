@@ -41,7 +41,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
-        /* Нереально красивый центральный элемент (аватарка) */
+        /* Аватарка */
         .avatar-container {
             width: 110px;
             height: 110px;
@@ -72,7 +72,7 @@
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.8);
         }
 
-        /* Сочная анимация тапа и сама кнопка */
+        /* Кнопка тапа */
         .clicker-btn {
             background: linear-gradient(135deg, #ff416c, #ff4b2b, #ff8008);
             border: none;
@@ -96,7 +96,7 @@
             box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
         }
 
-        /* Вылетающие цифры при клике */
+        /* Вылетающие цифры */
         .floating-text {
             position: absolute;
             font-weight: bold;
@@ -150,6 +150,38 @@
             cursor: not-allowed;
         }
         
+        /* Колесо удачи (визуальный блок) */
+        .wheel-box-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 15px auto;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 26px;
+            z-index: 20;
+            color: #ff3333;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid #333;
+            background: conic-gradient(
+                #27ae60 0deg 198deg,   
+                #2980b9 198deg 306deg, 
+                #8e44ad 306deg 342deg, 
+                #f1c40f 342deg 360deg  
+            );
+            transition: transform 4.5s cubic-bezier(0.15, 0.95, 0.15, 1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
         /* Топ чарта */
         .leaderboard {
             background: var(--tg-theme-secondary-bg-color, #1e1e1e);
@@ -249,7 +281,6 @@
             cursor: not-allowed;
         }
         
-        /* Заметная кнопка предпросмотра (изменен цвет) */
         .preview-btn {
             background: linear-gradient(135deg, #8e44ad, #3498db);
             color: #ffffff;
@@ -268,7 +299,6 @@
             transform: scale(1.08);
         }
 
-        /* Цвет описания проблемы — строгий черный текст */
         .feedback-input {
             width: 100%;
             background: #ffffff !important;
@@ -293,75 +323,20 @@
         }
 
         /* Анимации рамок */
-        @keyframes spinGradient {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
-            50% { transform: scale(1.04); box-shadow: 0 0 25px #ff00ff, 0 0 45px #00ffff; }
-        }
-        @keyframes matrixScan {
-            0% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; }
-            50% { border-color: #00ffff; box-shadow: inset 0 0 20px #00ffff; }
-            100% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; }
-        }
-        @keyframes neonPulse {
-            0%, 100% { border-color: #00ffcc; box-shadow: 0 0 10px #00ffcc, inset 0 0 8px #00ffcc; }
-            50% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 18px #ff00ff; }
-        }
-        @keyframes lavaBreathe {
-            0%, 100% { border-color: #ff2200; box-shadow: 0 0 15px #ff2200, inset 0 0 10px #ff5500; }
-            50% { border-color: #ffbb00; box-shadow: 0 0 35px #ff5500, inset 0 0 22px #ffbb00; }
-        }
-        @keyframes cryoPrism {
-            0%, 100% { border-color: #00f2fe; box-shadow: 0 0 20px rgba(0,242,254,0.6), inset 0 0 12px rgba(74,144,226,0.5); filter: brightness(1); }
-            50% { border-color: #ffffff; box-shadow: 0 0 35px rgba(0,242,254,0.9), inset 0 0 22px rgba(255,255,255,0.8); filter: brightness(1.2); }
-        }
-        @keyframes fireStormPro {
-            0% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); }
-            50% { border-color: #ffea00; box-shadow: 0 0 40px #ff0055, inset 0 0 25px #ff2a00; filter: hue-rotate(20deg); }
-            100% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); }
-        }
-        @keyframes singularityCosmos {
-            0% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(0deg); }
-            50% { border-color: #00bfff; box-shadow: 0 0 40px #ff1493, 0 0 70px #9400d3, inset 0 0 30px #00ffff; }
-            100% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(360deg); }
-        }
-        @keyframes obsidianThroneEpic {
-            0%, 100% { 
-                border-color: #3b0066; 
-                box-shadow: 0 0 25px #150024, 0 0 50px rgba(138, 43, 226, 0.4), inset 0 0 20px #ff3300; 
-                filter: brightness(0.9);
-            }
-            50% { 
-                border-color: #ff3300; 
-                box-shadow: 0 0 40px #4b0082, 0 0 80px rgba(255, 51, 0, 0.6), inset 0 0 35px #9900ff; 
-                filter: brightness(1.25);
-            }
-        }
-        @keyframes divineNimbUltra {
-            0% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(0deg); transform: scale(1); }
-            50% { border-color: #ffffff; box-shadow: 0 0 50px #00ffff, 0 0 90px #ffd700, 0 0 120px #ff00ff, inset 0 0 40px #ffd700; filter: hue-rotate(180deg); transform: scale(1.03); }
-            100% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(360deg); transform: scale(1); }
-        }
+        @keyframes spinGradient { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; } 50% { transform: scale(1.04); box-shadow: 0 0 25px #ff00ff, 0 0 45px #00ffff; } }
+        @keyframes matrixScan { 0% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; } 50% { border-color: #00ffff; box-shadow: inset 0 0 20px #00ffff; } 100% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; } }
+        @keyframes neonPulse { 0%, 100% { border-color: #00ffcc; box-shadow: 0 0 10px #00ffcc, inset 0 0 8px #00ffcc; } 50% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 18px #ff00ff; } }
+        @keyframes lavaBreathe { 0%, 100% { border-color: #ff2200; box-shadow: 0 0 15px #ff2200, inset 0 0 10px #ff5500; } 50% { border-color: #ffbb00; box-shadow: 0 0 35px #ff5500, inset 0 0 22px #ffbb00; } }
+        @keyframes cryoPrism { 0%, 100% { border-color: #00f2fe; box-shadow: 0 0 20px rgba(0,242,254,0.6), inset 0 0 12px rgba(74,144,226,0.5); filter: brightness(1); } 50% { border-color: #ffffff; box-shadow: 0 0 35px rgba(0,242,254,0.9), inset 0 0 22px rgba(255,255,255,0.8); filter: brightness(1.2); } }
+        @keyframes fireStormPro { 0% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); } 50% { border-color: #ffea00; box-shadow: 0 0 40px #ff0055, inset 0 0 25px #ff2a00; filter: hue-rotate(20deg); } 100% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); } }
+        @keyframes singularityCosmos { 0% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(0deg); } 50% { border-color: #00bfff; box-shadow: 0 0 40px #ff1493, 0 0 70px #9400d3, inset 0 0 30px #00ffff; } 100% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(360deg); } }
+        @keyframes obsidianThroneEpic { 0%, 100% { border-color: #3b0066; box-shadow: 0 0 25px #150024, 0 0 50px rgba(138, 43, 226, 0.4), inset 0 0 20px #ff3300; filter: brightness(0.9); } 50% { border-color: #ff3300; box-shadow: 0 0 40px #4b0082, 0 0 80px rgba(255, 51, 0, 0.6), inset 0 0 35px #9900ff; filter: brightness(1.25); } }
+        @keyframes divineNimbUltra { 0% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(0deg); transform: scale(1); } 50% { border-color: #ffffff; box-shadow: 0 0 50px #00ffff, 0 0 90px #ffd700, 0 0 120px #ff00ff, inset 0 0 40px #ffd700; filter: hue-rotate(180deg); transform: scale(1.03); } 100% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(360deg); transform: scale(1); } }
 
-        .animated-spin-border {
-            position: relative;
-            overflow: hidden;
-        }
-        .animated-spin-border::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
-            animation: spinGradient 4s linear infinite;
-            z-index: 1;
-        }
-        .animated-spin-border .avatar-inner {
-            position: relative;
-            z-index: 2;
-        }
+        .animated-spin-border { position: relative; overflow: hidden; }
+        .animated-spin-border::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000); animation: spinGradient 4s linear infinite; z-index: 1; }
+        .animated-spin-border .avatar-inner { position: relative; z-index: 2; }
 
         .animated-pulse-glow { animation: pulseGlow 2.5s infinite ease-in-out; }
         .animated-cryo { animation: cryoPrism 3s infinite ease-in-out; }
@@ -433,19 +408,30 @@
             <div>Звезды: <span id="userStars" style="color: #ffd700; font-weight: bold;">0</span> ⭐️</div>
         </div>
 
-        <!-- Кликер для фарма XP (под ним сразу топ чарта) -->
+        <!-- Кликер для фарма XP -->
         <div class="card" id="clickerCard">
             <div style="font-size: 14px; margin-bottom: 5px;">Тапай для разгона хайпа! (+10 XP)</div>
             <button class="clicker-btn" id="tapBtn" onclick="tapXp(event)">🔥</button>
             <div id="boostStatus" class="boost-status"></div>
-            <button class="btn" id="dailyBtn" onclick="claimDaily()" style="background: #27ae60;">🎁 Забрать бонус (+100 XP)</button>
+        </div>
+
+        <!-- Ежедневное Колесо Удачи с анимацией -->
+        <div class="card">
+            <div class="section-title" style="margin-top: 0;">🎁 Ежедневное Колесо Удачи</div>
+            <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin-bottom: 5px;">Бесплатно раз в сутки • От 100 до 2000 XP (Джекпот 5%)</div>
+            
+            <div class="wheel-box-container">
+                <div class="wheel-pointer">▼</div>
+                <div id="wheel" class="wheel"></div>
+            </div>
+
+            <button class="btn" id="dailySpinBtn" onclick="spinDailyWheel()" style="background: #27ae60;">🎰 Вращать колесо</button>
+            <div id="wheelResult" style="font-size: 14px; font-weight: bold; margin-top: 10px; min-height: 20px;"></div>
         </div>
 
         <!-- Топ чарта -->
         <div class="section-title">🏆 Топ чарта</div>
-        <div class="leaderboard" id="leaderboardList">
-            <!-- Динамически заполнится реальными данными игрока -->
-        </div>
+        <div class="leaderboard" id="leaderboardList"></div>
 
         <!-- Магазин рамок профиля -->
         <div class="card" style="text-align: left;">
@@ -459,15 +445,14 @@
             </div>
         </div>
 
-        <!-- Магазин и Тюнинг -->
+        <!-- Действия & Тюнинг -->
         <div class="card" style="text-align: left;">
             <div class="section-title" style="margin-top: 0;">Действия & Тюнинг</div>
             <button class="btn" onclick="buyBoost()">🚀 Ускорить хайп (5 ⭐️)</button>
-            <button class="btn" onclick="spinWheel()" style="background: #8e44ad;">🎰 Колесо удачи (10 000 XP)</button>
             <button class="btn" onclick="getRefLink()" style="background: #9b59b6;">🎯 Пригласить друга (+20 ⭐️)</button>
         </div>
 
-        <!-- Сообщить об ошибке / Предложить идею -->
+        <!-- Обратная связь -->
         <div class="card" style="text-align: left;">
             <div class="section-title" style="margin-top: 0;">💬 Обратная связь</div>
             <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa);">Нашёл баг или есть идея? Напиши разработчику!</div>
@@ -497,7 +482,9 @@
         let stars = 0;
         let lastClaimTimestamp = 0;
         let boostUntil = 0;
-        let isShopOpen = false; // Магазин по умолчанию закрыт
+        let isShopOpen = false;
+        let currentWheelRotation = 0;
+        let isSpinning = false;
 
         const framesData = [
             { id: 'f_xp_1', name: 'Древесный массив', type: 'xp', price: 1000, css: 'border: 4px solid #8B4513; background: repeating-linear-gradient(45deg, #3d1c02, #3d1c02 10px, #261101 10px, #261101 20px);' },
@@ -671,39 +658,75 @@
             localStorage.setItem('flex_equipped_frame_backup', equippedFrame);
         }
 
+        // Проверка таймера и отсчет (24 часа с момента последнего прокрута)
         function checkDailyStatus() {
-            const now = new Date();
-            let target8amToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0).getTime();
-            if (now.getTime() < target8amToday) {
-                target8amToday -= 24 * 60 * 60 * 1000;
-            }
+            const now = Date.now();
+            const cooldownTime = 24 * 60 * 60 * 1000; // 24 часа
+            const timePassed = now - lastClaimTimestamp;
+            const btn = document.getElementById('dailySpinBtn');
 
-            const btn = document.getElementById('dailyBtn');
-            if (lastClaimTimestamp >= target8amToday) {
-                btn.innerText = "⏳ Бонус уже получен (сброс в 08:00)";
+            if (timePassed < cooldownTime) {
+                const timeLeft = cooldownTime - timePassed;
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                btn.innerText = `⏳ Следующий прокрут через ${hours}ч ${minutes}м ${seconds}с`;
                 btn.disabled = true;
+                setTimeout(checkDailyStatus, 1000); // Обновляем каждую секунду
             } else {
-                btn.innerText = "🎁 Забрать бонус (+100 XP)";
+                btn.innerText = "🎰 Вращать колесо";
                 btn.disabled = false;
+                document.getElementById('wheelResult').innerText = "";
             }
         }
 
-        function claimDaily() {
-            const now = new Date();
-            let target8amToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0).getTime();
-            if (now.getTime() < target8amToday) {
-                target8amToday -= 24 * 60 * 60 * 1000;
+        // Логика вращения ежедневного колеса с вероятностями (от 100 до 2000 XP, джекпот 5%)
+        function spinDailyWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const btn = document.getElementById('dailySpinBtn');
+            const wheel = document.getElementById('wheel');
+            const resultDiv = document.getElementById('wheelResult');
+
+            btn.disabled = true;
+            resultDiv.innerText = "Колесо крутится...";
+
+            // Расчет награды
+            const roll = Math.random() * 100;
+            let prize = 0;
+            if (roll < 55) {
+                prize = Math.floor(Math.random() * 201) + 100;    // 100 - 300 XP (55%)
+            } else if (roll < 85) {
+                prize = Math.floor(Math.random() * 500) + 301;    // 301 - 800 XP (30%)
+            } else if (roll < 95) {
+                prize = Math.floor(Math.random() * 1199) + 801;   // 801 - 1999 XP (10%)
+            } else {
+                prize = 2000;                                     // 2000 XP (5% джекпот)
             }
 
-            if (lastClaimTimestamp < target8amToday) {
-                xp += 100;
-                lastClaimTimestamp = now.getTime();
+            // Добавляем полные обороты (6 кругов = 2160 градусов) + рандом
+            const randomDegree = Math.floor(Math.random() * 360);
+            const totalRotation = currentWheelRotation + 2160 + randomDegree;
+            
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            currentWheelRotation = totalRotation;
+
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+
+            setTimeout(() => {
+                xp += prize;
+                lastClaimTimestamp = Date.now();
                 saveData();
-                checkDailyStatus();
                 updateUI();
-                renderShop();
+                
+                isSpinning = false;
+                resultDiv.innerText = `🎉 Вы выиграли +${prize} XP!`;
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            }
+                
+                checkDailyStatus(); // Запускаем таймер отсчета
+            }, 4500);
         }
 
         function tapXp(event) {
@@ -739,20 +762,6 @@
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } else {
                 alert('Недостаточно звезд для буста!');
-            }
-        }
-
-        function spinWheel() {
-            if (xp >= 10000) {
-                xp -= 10000;
-                const rewardStars = Math.floor(Math.random() * 20) + 5;
-                stars += rewardStars;
-                saveData();
-                updateUI();
-                alert(`Колесо удачи сыграно! Вы выиграли ${rewardStars} звезд! ⭐️`);
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                alert('Нужно минимум 10 000 XP для вращения колеса!');
             }
         }
 
@@ -799,9 +808,7 @@
                         parse_mode: 'HTML',
                         reply_markup: {
                             inline_keyboard: [
-                                [
-                                    { text: "💬 Написать игроку", url: `tg://user?id=${userId}` }
-                                ]
+                                [{ text: "💬 Написать игроку", url: `tg://user?id=${userId}` }]
                             ]
                         }
                     })
@@ -842,13 +849,8 @@
                 } else if (isOwned) {
                     actionBtnHTML = `<button class="shop-btn" onclick="equipFrame('${frame.id}')">Надеть</button>`;
                 } else {
-                    if (frame.type === 'xp') {
-                        const canBuy = xp >= frame.price;
-                        actionBtnHTML = `<button class="shop-btn ${canBuy ? '' : 'locked'}" onclick="buyFrame('${frame.id}')">Купить</button>`;
-                    } else {
-                        const canBuy = stars >= frame.price;
-                        actionBtnHTML = `<button class="shop-btn ${canBuy ? '' : 'locked'}" onclick="buyFrame('${frame.id}')">Купить</button>`;
-                    }
+                    const canBuy = frame.type === 'xp' ? xp >= frame.price : stars >= frame.price;
+                    actionBtnHTML = `<button class="shop-btn ${canBuy ? '' : 'locked'}" onclick="buyFrame('${frame.id}')">Купить</button>`;
                 }
 
                 itemEl.innerHTML = `
@@ -883,12 +885,8 @@
             const frame = framesData.find(f => f.id === equippedFrame);
             if (!frame) return;
 
-            if (frame.specialClass) {
-                avatarBox.classList.add(frame.specialClass);
-            }
-            if (frame.css) {
-                avatarBox.style.cssText += frame.css;
-            }
+            if (frame.specialClass) avatarBox.classList.add(frame.specialClass);
+            if (frame.css) avatarBox.style.cssText += frame.css;
         }
 
         function buyFrame(frameId) {
