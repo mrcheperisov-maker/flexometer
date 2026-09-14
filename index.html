@@ -692,16 +692,17 @@
         }
 
         // ИСПРАВЛЕНА ОТПРАВКА С ТЕЛЕФОНА: отправка через sendData + принудительное закрытие tg.close()
-        async function sendFeedback() {
+     async function sendFeedback() {
     const text = document.getElementById('feedbackText').value.trim();
     if (!text) {
         alert('Введите текст сообщения!');
         return;
     }
     
-    // Получаем ID пользователя прямо из объекта Telegram WebApp
+    // Получаем ID и имя пользователя из Telegram WebApp
     const userId = tg.initDataUnsafe?.user?.id;
     const userName = tg.initDataUnsafe?.user?.first_name || "Пользователь";
+    const userUsername = tg.initDataUnsafe?.user?.username ? `@${tg.initDataUnsafe?.user?.username}` : "нет юзернейма";
     
     if (!userId) {
         alert('Не удалось определить ваш ID. Откройте приложение из Telegram.');
@@ -709,24 +710,30 @@
     }
 
     try {
-        // Токен вашего бота и ID администратора (куда слать)
         const BOT_TOKEN = "8621467356:AAEzfMdw8tiqa8kIkQd3xgDGZSN_VyaBhpc";
         const ADMIN_ID = 1149554270;
         
-        const reportText = `💬 <b>Новый отзыв или баг из Флексометра!</b>\n\n👤 <b>От:</b> ${userName} (ID: <code>${userId}</code>)\n📝 <b>Текст:</b>\n${text}`;
+        const reportText = `💬 <b>Новый отзыв или баг из Флексометра!</b>\n\n👤 <b>От:</b> ${userName} (${userUsername}, ID: <code>${userId}</code>)\n📝 <b>Текст:</b>\n${text}`;
 
-        // 1. Отправляем отчет вам (админу)
+        // 1. Отправляем отчет тебе (админу) С КНОПКОЙ СВЯЗИ
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: ADMIN_ID,
                 text: reportText,
-                parse_mode: 'HTML'
+                parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: "💬 Написать игроку", url: `tg://user?id=${userId}` }
+                        ]
+                    ]
+                }
             })
         });
 
-        // 2. Отправляем ответ пользователю в его чат с ботом, чтобы он видел подтверждение
+        // 2. Отправляем подтверждение пользователю в чат с ботом
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -736,7 +743,7 @@
             })
         });
 
-        // Очищаем поле и показываем уведомление прямо в приложении (оно НЕ закроется!)
+        // Очищаем поле, приложение при этом остается открытым
         document.getElementById('feedbackText').value = '';
         alert('Сообщение успешно отправлено!');
 
