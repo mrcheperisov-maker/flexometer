@@ -155,9 +155,6 @@
             transition: all 0.4s ease;
             overflow: hidden;
         }
-        #wheelCard.hidden-block {
-            display: none !important;
-        }
         .wheel-box-container {
             position: relative;
             width: 220px;
@@ -261,7 +258,6 @@
             font-size: 13px;
             font-weight: bold;
             color: #2481cc;
-            text-decoration: underline;
         }
         .shop-price {
             font-size: 12px;
@@ -297,17 +293,9 @@
             color: #ffffff;
             border: 1px solid #9b59b6;
             border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 15px;
+            padding: 6px 10px;
+            font-size: 14px;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
-            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-        }
-        .preview-btn:hover {
-            background: linear-gradient(135deg, #9b59b6, #2980b9);
-            border-color: #3498db;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
-            transform: scale(1.08);
         }
 
         .feedback-input {
@@ -322,15 +310,8 @@
             margin-top: 8px;
             outline: none;
             font-family: inherit;
-            pointer-events: auto !important;
             -webkit-user-select: text;
             user-select: text;
-        }
-        .feedback-input::placeholder {
-            color: #666666;
-        }
-        .feedback-input:focus {
-            border-color: #2481cc;
         }
 
         /* Анимации рамок */
@@ -339,14 +320,14 @@
         @keyframes matrixScan { 0% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; } 50% { border-color: #00ffff; box-shadow: inset 0 0 20px #00ffff; } 100% { border-color: #00ff55; box-shadow: inset 0 0 10px #00ff55; } }
         @keyframes neonPulse { 0%, 100% { border-color: #00ffcc; box-shadow: 0 0 10px #00ffcc, inset 0 0 8px #00ffcc; } 50% { border-color: #ff00ff; box-shadow: 0 0 25px #ff00ff, inset 0 0 18px #ff00ff; } }
         @keyframes lavaBreathe { 0%, 100% { border-color: #ff2200; box-shadow: 0 0 15px #ff2200, inset 0 0 10px #ff5500; } 50% { border-color: #ffbb00; box-shadow: 0 0 35px #ff5500, inset 0 0 22px #ffbb00; } }
-        @keyframes cryoPrism { 0%, 100% { border-color: #00f2fe; box-shadow: 0 0 20px rgba(0,242,254,0.6), inset 0 0 12px rgba(74,144,226,0.5); filter: brightness(1); } 50% { border-color: #ffffff; box-shadow: 0 0 35px rgba(0,242,254,0.9), inset 0 0 22px rgba(255,255,255,0.8); filter: brightness(1.2); } }
-        @keyframes fireStormPro { 0% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); } 50% { border-color: #ffea00; box-shadow: 0 0 40px #ff0055, inset 0 0 25px #ff2a00; filter: hue-rotate(20deg); } 100% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; filter: hue-rotate(0deg); } }
-        @keyframes singularityCosmos { 0% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(0deg); } 50% { border-color: #00bfff; box-shadow: 0 0 40px #ff1493, 0 0 70px #9400d3, inset 0 0 30px #00ffff; } 100% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff, inset 0 0 20px #ff1493; transform: rotate(360deg); } }
-        @keyframes obsidianThroneEpic { 0%, 100% { border-color: #3b0066; box-shadow: 0 0 25px #150024, 0 0 50px rgba(138, 43, 226, 0.4), inset 0 0 20px #ff3300; filter: brightness(0.9); } 50% { border-color: #ff3300; box-shadow: 0 0 40px #4b0082, 0 0 80px rgba(255, 51, 0, 0.6), inset 0 0 35px #9900ff; filter: brightness(1.25); } }
-        @keyframes divineNimbUltra { 0% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(0deg); transform: scale(1); } 50% { border-color: #ffffff; box-shadow: 0 0 50px #00ffff, 0 0 90px #ffd700, 0 0 120px #ff00ff, inset 0 0 40px #ffd700; filter: hue-rotate(180deg); transform: scale(1.03); } 100% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff007f, 0 0 90px #00ffff, inset 0 0 25px #fff; filter: hue-rotate(360deg); transform: scale(1); } }
+        @keyframes cryoPrism { 0%, 100% { border-color: #00f2fe; box-shadow: 0 0 20px rgba(0,242,254,0.6), inset 0 0 12px rgba(74,144,226,0.5); } 50% { border-color: #ffffff; box-shadow: 0 0 35px rgba(0,242,254,0.9), inset 0 0 22px rgba(255,255,255,0.8); } }
+        @keyframes fireStormPro { 0% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; } 50% { border-color: #ffea00; box-shadow: 0 0 40px #ff0055, inset 0 0 25px #ff2a00; } 100% { border-color: #ff2a00; box-shadow: 0 0 20px #ff2a00, inset 0 0 15px #ff7700; } }
+        @keyframes singularityCosmos { 0% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff; transform: rotate(0deg); } 50% { border-color: #00bfff; box-shadow: 0 0 40px #ff1493, 0 0 70px #9400d3; } 100% { border-color: #9400d3; box-shadow: 0 0 25px #9400d3, 0 0 50px #00bfff; transform: rotate(360deg); } }
+        @keyframes obsidianThroneEpic { 0%, 100% { border-color: #3b0066; box-shadow: 0 0 25px #150024; } 50% { border-color: #ff3300; box-shadow: 0 0 40px #4b0082; } }
+        @keyframes divineNimbUltra { 0% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700; transform: scale(1); } 50% { border-color: #ffffff; box-shadow: 0 0 50px #00ffff; transform: scale(1.03); } 100% { border-color: #ffd700; box-shadow: 0 0 30px #ffd700; transform: scale(1); } }
 
         .animated-spin-border { position: relative; overflow: hidden; }
-        .animated-spin-border::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000); animation: spinGradient 4s linear infinite; z-index: 1; }
+        .animated-spin-border::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff, #ff0000); animation: spinGradient 4s linear infinite; z-index: 1; }
         .animated-spin-border .avatar-inner { position: relative; z-index: 2; }
 
         .animated-pulse-glow { animation: pulseGlow 2.5s infinite ease-in-out; }
@@ -451,7 +432,7 @@
                 <span id="shopArrow" class="arrow-icon collapsed">▼</span>
             </div>
             <div id="shopContainer">
-                <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin: 8px 0;">Нажмите на глазок (👁), чтобы открыть превью и купить рамку!</div>
+                <div style="font-size: 12px; color: var(--tg-theme-hint-color, #aaa); margin: 8px 0;">Нажмите на рамку или глаз для предпросмотра!</div>
                 <div class="shop-grid hidden" id="shopList"></div>
             </div>
         </div>
@@ -480,7 +461,7 @@
                 <div class="modal-avatar-inner" style="font-size: 45px; z-index: 2;">👶</div>
             </div>
             <div id="modalPrice" style="font-size: 13px; color: #ffd700; margin-bottom: 5px;">Цена</div>
-            <button class="btn" id="modalActionBtn" onclick="unlockOrEquipFromModal()">Разблокировать</button>
+            <button class="btn" id="modalActionBtn" onclick="unlockOrEquipFromModal()">Купить</button>
             <button class="close-modal" onclick="closePreview()">Закрыть</button>
         </div>
     </div>
@@ -497,7 +478,6 @@
         let currentWheelRotation = 0;
         let isSpinning = false;
 
-        // 10 секций колеса: индекс 0 — 5000 XP (1% шанс), остальные 9 секций — до 2000 XP
         const sectors = [
             { text: "5000 👑", prize: 5000, color: "#f1c40f", textColor: "#000" },
             { text: "2000 XP", prize: 2000, color: "#e67e22", textColor: "#fff" },
@@ -523,7 +503,6 @@
                 const end = (i + 1) * sectorAngle;
                 gradientParts.push(`${sec.color} ${start}deg ${end}deg`);
 
-                // Точное позиционирование цифр по центру каждой секции
                 const angleDeg = i * sectorAngle + (sectorAngle / 2);
                 const angleRad = (angleDeg - 90) * (Math.PI / 180);
                 const radius = 68;
@@ -623,9 +602,10 @@
             leaderboardList.innerHTML = `
                 <div class="leader-item my-score">
                     <span>👑 1. ${tgUser?.first_name || 'Вы'} (Ур. ${info.level})</span>
-                    <span style="color: #00ff66; font-weight: bold; text-shadow: 0 0 8px rgba(0,255,102,0.6);">${xp.toLocaleString()} XP</span>
+                    <span style="color: #00ff66; font-weight: bold;">${xp.toLocaleString()} XP</span>
                 </div>
             `;
+            renderShop();
         }
 
         function toggleShop() {
@@ -680,7 +660,6 @@
 
                                     saveData();
                                     updateUI();
-                                    renderShop();
                                     applyEquippedStyle();
                                     checkDailyStatus();
                                 });
@@ -696,7 +675,6 @@
                 equippedFrame = localEq;
 
                 updateUI();
-                renderShop();
                 applyEquippedStyle();
                 checkDailyStatus();
             }
@@ -719,24 +697,19 @@
 
         function checkDailyStatus() {
             const now = new Date();
-            
-            // Расчет сброса в 8:00 утра по текущему дню
             let nextReset = new Date(now);
             nextReset.setHours(8, 0, 0, 0);
             
             if (now.getTime() >= nextReset.getTime()) {
-                // Если сейчас уже позже 8:00 утра, то следующий сброс завтра в 8:00
                 nextReset.setDate(nextReset.getDate() + 1);
             }
 
             let lastReset = new Date(nextReset);
-            lastReset.setDate(lastReset.getDate() - 1); // Вчера в 8:00
+            lastReset.setDate(lastReset.getDate() - 1);
 
             const btn = document.getElementById('dailySpinBtn');
 
-            // Проверяем, крутил ли пользователь после последнего 8:00 утра
             if (lastClaimTimestamp >= lastReset.getTime()) {
-                // Вычисляем время до следующего сброса в 8:00
                 const timeLeft = nextReset.getTime() - now.getTime();
                 const hoursLeft = Math.floor(timeLeft / (60 * 60 * 1000));
                 const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
@@ -750,7 +723,6 @@
             }
         }
 
-        // Логика вращения колеса (10 секций, 1% на 5000 XP)
         function spinDailyWheel() {
             if (isSpinning) return;
             isSpinning = true;
@@ -767,14 +739,12 @@
             const sectorAngle = 360 / sectors.length;
 
             if (roll < 1) {
-                selectedIndex = 0; // 5000 XP (1% шанс)
+                selectedIndex = 0;
             } else {
                 selectedIndex = Math.floor(Math.random() * (sectors.length - 1)) + 1;
             }
 
             const prize = sectors[selectedIndex].prize;
-
-            // Расчет точного угла остановки по центру выбранного сектора
             const targetOffset = 360 - (selectedIndex * sectorAngle + (sectorAngle / 2));
             const totalRotation = currentWheelRotation + 5 * 360 + targetOffset;
             
@@ -794,7 +764,6 @@
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                 
                 checkDailyStatus();
-
             }, 4500);
         }
 
@@ -876,28 +845,16 @@
                         text: reportText,
                         parse_mode: 'HTML',
                         reply_markup: {
-                            inline_keyboard: [
-                                [{ text: "💬 Написать игроку", url: `tg://user?id=${userId}` }]
-                            ]
+                            inline_keyboard: [[{ text: "💬 Написать игроку", url: `tg://user?id=${userId}` }]]
                         }
-                    })
-                });
-
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: userId,
-                        text: "✅ Спасибо! Твое сообщение успешно отправлено разработчику."
                     })
                 });
 
                 document.getElementById('feedbackText').value = '';
                 alert('Сообщение успешно отправлено!');
-
             } catch (error) {
                 console.error('Ошибка отправки:', error);
-                alert('Не удалось отправить сообщение. Попробуйте позже.');
+                alert('Не удалось отправить сообщение.');
             }
         }
 
@@ -908,6 +865,9 @@
             framesData.forEach(frame => {
                 const isOwned = ownedFrames.includes(frame.id);
                 const isEquipped = equippedFrame === frame.id;
+                
+                // Проверяем, хватает ли у пользователя очков или звезд для покупки
+                const canAfford = frame.type === 'xp' ? xp >= frame.price : stars >= frame.price;
 
                 const itemEl = document.createElement('div');
                 itemEl.className = 'shop-item';
@@ -918,7 +878,13 @@
                 } else if (isOwned) {
                     actionBtnHTML = `<button class="shop-btn" onclick="equipFrame('${frame.id}')">Надеть</button>`;
                 } else {
-                    actionBtnHTML = `<button class="shop-btn locked" onclick="openPreview('${frame.id}')">👁 Заглянуть</button>`;
+                    if (canAfford) {
+                        // Очки достигнуты — кнопка активная "Купить"
+                        actionBtnHTML = `<button class="shop-btn" onclick="openPreview('${frame.id}')">Купить</button>`;
+                    } else {
+                        // Недостаточно очков — заблокированная кнопка "Купить"
+                        actionBtnHTML = `<button class="shop-btn locked" onclick="openPreview('${frame.id}')">Купить</button>`;
+                    }
                 }
 
                 itemEl.innerHTML = `
@@ -939,7 +905,6 @@
             equippedFrame = frameId;
             saveData();
             updateUI();
-            renderShop();
             applyEquippedStyle();
         }
 
@@ -967,7 +932,6 @@
                     equippedFrame = frame.id;
                     saveData();
                     updateUI();
-                    renderShop();
                     applyEquippedStyle();
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                     closePreview();
@@ -981,7 +945,6 @@
                     equippedFrame = frame.id;
                     saveData();
                     updateUI();
-                    renderShop();
                     applyEquippedStyle();
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                     closePreview();
@@ -1009,6 +972,7 @@
             const actionBtn = document.getElementById('modalActionBtn');
             const isOwned = ownedFrames.includes(frame.id);
             const isEquipped = equippedFrame === frame.id;
+            const canAfford = frame.type === 'xp' ? xp >= frame.price : stars >= frame.price;
 
             if (isEquipped) {
                 actionBtn.innerText = "Уже надето";
@@ -1019,9 +983,14 @@
                 actionBtn.disabled = false;
                 modalTargetId = frame.id;
             } else {
-                actionBtn.innerText = "Купить и надеть";
-                actionBtn.disabled = false;
-                modalTargetId = frame.id;
+                actionBtn.innerText = "Купить";
+                if (canAfford) {
+                    actionBtn.disabled = false;
+                    modalTargetId = frame.id;
+                } else {
+                    actionBtn.disabled = true;
+                    modalTargetId = null;
+                }
             }
 
             document.getElementById('previewModal').style.display = 'flex';
